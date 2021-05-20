@@ -1,0 +1,26 @@
+<style>
+    #body {
+    }
+
+    #video {
+        max-width: 75%;
+        max-height: 75%;
+    }
+
+    @media only screen and (max-width: 600px) {
+        #video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+</style>
+
+<html>
+    <div id="body">
+        <video id="video" controls>
+            <source src="../views/static/videos/example.mp4" type="video/mp4">
+        </video>
+    </div>
+</html>
+
+{{!-- https://www.youtube.com/watch?v=MxfxiR8TVNU --}}
