@@ -1,6 +1,6 @@
 <style>
     #header {
-        background-color: #222;
+        background-color: var(--main-head-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -11,10 +11,49 @@
     }
 
     #body {
-        background-color: #333;
+        padding-top: 10px;
+        background-color: var(--main-bg-color);
         height: 100vh;
     }
 
+    .modal-background {
+        display: none;
+
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        background-color: rgba(0, 0, 0, 0.5);
+
+        z-index: 20;
+    }
+    .modal-background > div {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .progress-bar {
+        height: 35px;
+        width: 250px;
+        background-color: #ddd;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background-color: #04AA6D;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        transition: width 0.25s;
+    }
+    .progress-bar-text {
+        margin-left: 10px;
+        font-weight: bold;
+    }
 </style>
 
 <div class="message">
@@ -27,6 +66,11 @@
     </div>
 
     <div id="body">
-
+        {{#each videos}}
+            <h3>{{this.caption}}</h3>
+            <video id="video" controls>
+                <source src="/videos/{{this.id}}" type="video/mp4">
+            </video>
+        {{/each}}
     </div>
 </div>

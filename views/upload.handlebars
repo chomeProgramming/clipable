@@ -1,0 +1,176 @@
+<style>
+    #header {
+        background-color: #222;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #header__login {
+        margin-right: 20px;
+    }
+
+    #body {
+        padding-top: 10px;
+        background-color: #333;
+        height: 100vh;
+    }
+
+    #upload-div {
+        padding: 10px;
+    }
+
+    .modal-background {
+        display: none;
+
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        background-color: rgba(0, 0, 0, 0.5);
+
+        z-index: 20;
+    }
+    .modal-background > div {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .progress-bar {
+        height: 35px;
+        width: 250px;
+        background-color: #ddd;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background-color: #04AA6D;
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        transition: width 0.25s;
+    }
+    .progress-bar-text {
+        margin-left: 10px;
+        font-weight: bold;
+    }
+
+    #upload {
+        position: absolute;
+        top: 200px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    #create {
+        background-color: #333;
+        height: 100vh;
+    }
+
+    @media only screen and (max-width: 600px) {
+        #upload {
+            position: unset;
+            top: unset;
+            left: unset;
+            transform: unset;
+        }
+    }
+</style>
+
+<div id="create">
+    <div id="header">
+        <img src="../views/static/imgs/logo.png" alt="404 NOT FOUND" style="max-width: 85px; max-height: 75%;">
+        <div id="header__login">
+            <button type="button" class="btn btn-primary">LOGIN</button>
+            <button type="button" class="btn btn-primary">SIGN UP</button>
+        </div>
+    </div>
+
+    <div id="upload">
+        <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-video">
+            <div class="mb-3 upload-video" id="upload-div">
+                <input class="form-control" type="text" placeholder="TITLE">
+                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" maxlength="125"></textarea>
+                <input type="file" class="form-control" accept="video/*" name="video" id="chooseUploadVideo">
+                <button class="btn btn-primary" id="submitUpload" disabled>Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-background" id="uploadVideoModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Uploading...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="uploadVideoModal.style.display = 'none';"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="progressBar">
+                            <span class="progress-bar-text" id="progressBarSpan">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="stopUploadVideo" onclick="javascript:stopSubmitForm()">Stop</button>
+                    {{!-- <button type="button" class="btn btn-primary">Understood</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadVideoModal = document.querySelector("#uploadVideoModal")
+    const stopUploadVideo = document.querySelector("#stopUploadVideo")
+
+    const uploadVideo = document.querySelector("#upload-video")
+    const progressBar = document.querySelector("#progressBar")
+    const progressBarSpan = document.querySelector("#progressBarSpan")
+
+    const chooseUploadVideo = document.querySelector("#chooseUploadVideo")
+    const submitUpload = document.querySelector("#submitUpload")
+
+    chooseUploadVideo.onchange = e => {
+        if (e.target.value == "")
+            submitUpload.disabled = true
+        else
+            submitUpload.disabled = false
+    }
+
+    function closeModal() {
+        chooseUploadVideo.value = ""
+        uploadVideoModal.style.display = 'none';
+    }
+
+    uploadVideo.addEventListener("submit", event => {
+        event.preventDefault()
+
+        progressBar.style.width = 0
+        submitUpload.disabled = true
+
+        uploadVideoModal.style.display = "block"
+
+        const xhr = new XMLHttpRequest()
+        xhr.open(event.target.method, event.target.action, true)
+        xhr.upload.addEventListener("progress", e => {
+            const percent = e.lengthComputable ? (e.loaded / e.total) * 100 : 0
+            progressBar.style.width = percent + "%"
+            const afterPoint = 1
+            progressBarSpan.innerHTML = Math.round(percent * afterPoint) / afterPoint + "%"
+        })
+
+        // xhr.setRequestHeader("Content-type", event.target.enctype)
+        xhr.send(new FormData(uploadVideo))
+
+        stopUploadVideo.onclick = () => {
+            xhr.abort()
+        }
+    })
+</script>
