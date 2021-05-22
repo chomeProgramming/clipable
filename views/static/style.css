@@ -23,29 +23,8 @@
     border-radius: 7.5px;
     color: white;
 }
-
-#header {
-    background-color: var(--main-bg-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#header__login {
-    margin-right: 20px;
-}
-
 #body {
     padding-top: 10px;
     background-color: var(--main-bg-color);
     height: 100vh;
-}
-#header-image {
-    display: flex;
-    align-items: center;
-}
-
-#header-image > h2 {
-    color: var(--main-button-color);
-    font-weight: bold;
 }
