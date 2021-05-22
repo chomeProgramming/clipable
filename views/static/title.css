@@ -52,6 +52,9 @@
     }
 }
 
+
+/* first version: */
+/* for second version recomment all in this: */
 /* @media only screen and (max-width: 420px) { */
     #header__login {
         display: none;
@@ -59,11 +62,21 @@
     .menu {
         display: block;
     }
+    /* #input {
+        display: none;
+    } */
+/* } */
+/* until this */
 
+/* for second version delete this uncomment: */
+@media only screen and (max-width: 420px) {
     #input {
         display: none;
     }
-/* } */
+}
+/* until this */
+
+
 @media only screen and (max-width: 300px) {
     .menu {
         margin-right: 5px;
