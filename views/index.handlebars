@@ -1,21 +1,4 @@
 <style>
-    #header {
-        background-color: var(--main-head-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #header__login {
-        margin-right: 20px;
-    }
-
-    #body {
-        padding-top: 10px;
-        background-color: var(--main-bg-color);
-        height: 100vh;
-    }
-
     .modal-background {
         display: none;
 
@@ -56,18 +39,12 @@
     }
 </style>
 
-<div class="message">
-    <div id="header">
-        <img src="../views/static/imgs/logo.png" alt="404 NOT FOUND" style="max-width: 85px; max-height: 75%;">
-        <div id="header__login">
-            <button type="button" class="btn btn-primary">LOGIN</button>
-            <button type="button" class="btn btn-primary">SIGN UP</button>
-        </div>
-    </div>
+<div id="index">
 
     <div id="body">
         {{#each videos}}
-            <h3>{{this.caption}}</h3>
+            <h3>{{this.title}}</h3>
+            <h6>{{this.caption}}</h6>
             <video id="video" controls>
                 <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
             </video>

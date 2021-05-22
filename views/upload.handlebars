@@ -1,21 +1,4 @@
 <style>
-    #header {
-        background-color: #222;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #header__login {
-        margin-right: 20px;
-    }
-
-    #body {
-        padding-top: 10px;
-        background-color: #333;
-        height: 100vh;
-    }
-
     #upload-div {
         padding: 10px;
     }
@@ -82,19 +65,11 @@
 </style>
 
 <div id="create">
-    <div id="header">
-        <img src="../views/static/imgs/logo.png" alt="404 NOT FOUND" style="max-width: 85px; max-height: 75%;">
-        <div id="header__login">
-            <button type="button" class="btn btn-primary">LOGIN</button>
-            <button type="button" class="btn btn-primary">SIGN UP</button>
-        </div>
-    </div>
-
     <div id="upload">
         <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-video">
             <div class="mb-3 upload-video" id="upload-div">
-                <input class="form-control" type="text" placeholder="TITLE">
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" maxlength="125"></textarea>
+                <input class="form-control" type="text" placeholder="TITLE" id="uploadCaption" name="title" maxlength="32">
+                <input class="form-control" type="text" placeholder="CAPTION" id="uploadCaption" name="caption" maxlength="100">
                 <input type="file" class="form-control" accept="video/*" name="video" id="chooseUploadVideo">
                 <button class="btn btn-primary" id="submitUpload" disabled>Upload</button>
             </div>
@@ -135,14 +110,17 @@
     const progressBarSpan = document.querySelector("#progressBarSpan")
 
     const chooseUploadVideo = document.querySelector("#chooseUploadVideo")
+    const uploadCaption = document.querySelector("#uploadCaption")
     const submitUpload = document.querySelector("#submitUpload")
 
-    chooseUploadVideo.onchange = e => {
-        if (e.target.value == "")
+    const updateSubmitButton = () => {
+        if (uploadCaption.value == "" || chooseUploadVideo.value == "")
             submitUpload.disabled = true
         else
             submitUpload.disabled = false
     }
+    uploadCaption.oninput = updateSubmitButton
+    chooseUploadVideo.oninput = updateSubmitButton
 
     function closeModal() {
         chooseUploadVideo.value = ""
@@ -173,8 +151,19 @@
         xhr.upload.onabort = () => {
             window.location.href = "/create"
         }
-        xhr.upload.onloadend = () => {
+        /*xhr.upload.onloadend = () => {
             window.location.href = "/"
+        }*/
+        xhr.onload = function (e) {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    console.log(xhr.responseText)
+                    window.location.href = "/"
+                } else {
+                    alert(xhr.statusText)
+                    console.error(xhr.statusText)
+                }
+            }
         }
 
         stopUploadVideo.onclick = () => {

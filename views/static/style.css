@@ -1,5 +1,51 @@
 :root {
-    --main-bg-color: #313131;
-    --main-head-color: #222;
-    --main-button-color: #FC5185;
+    --main-bg-color: #0B0E11;
+    --main-ui-color: #151A21;
+    --main-button-color: #FD4D4D;
+}
+
+.button {
+    background-color: var(--main-button-color);
+    color: white;
+    font-weight: 700;
+}
+
+.button:hover {
+    background-color: var(--main-button-color);
+    color: rgb(212, 212, 212);
+    font-weight: 700;
+}
+
+.input {
+    background-color: var(--main-ui-color);
+    border: none;
+    padding: 5px;
+    border-radius: 7.5px;
+    color: white;
+}
+
+#header {
+    background-color: var(--main-bg-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#header__login {
+    margin-right: 20px;
+}
+
+#body {
+    padding-top: 10px;
+    background-color: var(--main-bg-color);
+    height: 100vh;
+}
+#header-image {
+    display: flex;
+    align-items: center;
+}
+
+#header-image > h2 {
+    color: var(--main-button-color);
+    font-weight: bold;
 }

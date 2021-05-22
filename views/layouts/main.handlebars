@@ -11,6 +11,23 @@
         <link rel="icon" href="/favicon.ico">
     </head>
     <body>
+        <div id="header">
+            <div id="header-image">
+                <img src="../views/static/imgs/logo.png" alt="404 NOT FOUND" style="max-width: 85px; max-height: 75%;">
+                <h2>CLIPABLE</h2>
+            </div>
+
+            <input type="text" placeholder="CLIP ID" maxlength="36" class="input"/>
+
+            <div id="header__login">
+                {{#if authUser}}
+                    <button type="button" class="btn button">LOGOUT</button>
+                {{else}}
+                    <button type="button" class="btn button">LOGIN</button>
+                    <button type="button" class="btn button">SIGN UP</button>
+                {{/if}}
+            </div>
+        </div>
         {{{ body }}}
     </body>
 </html>

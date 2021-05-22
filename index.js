@@ -4,7 +4,7 @@ const fs = require("fs")
 const path = require("path")
 const fileUpload = require("express-fileupload")
 const { Pool, Client } = require("pg")
-const multer = require('multer');
+const multer = require('multer')
 
 // const upload = multer({ dest: './uploads/' })
 const fileStorageEngine = multer.diskStorage({
@@ -47,7 +47,7 @@ const sqls = {
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.engine("handlebars", exphbs({ defaultLayout: "main" }))
+app.engine("handlebars", exphbs({ defaultLayout: "" }))
 app.set("view engine", "handlebars")
 
 app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
-    db.query("SELECT id, caption, mimetype FROM videos;", (err, result) => {
+    db.query("SELECT * FROM videos;", (err, result) => {
         if (err)
             console.log(err.message)
         res.render("index", {
@@ -82,23 +82,34 @@ app.post("/upload", upload.single("video"), (req, res) => {
         console.log("Error: Not get file from multer")
         return res.render("not_found")
     }
+    if (!req.body.title) {
+        console.log("Something is missing.")
+        return res.render("not_found")
+    }
 
-    console.log(req.file)
     const fileName = req.file.filename
-    db.query("INSERT INTO videos (id, mimetype, caption, video) VALUES ($1, $2, $3, $4);", [fileName.slice(0, fileName.lastIndexOf(".")), fileName.slice(fileName.lastIndexOf(".")+1), fileName, fs.readFileSync(`./uploads/videos/${fileName}`)], (err) => {
-        if (err)
+    const file_uuid = fileName.slice(0, fileName.lastIndexOf("."))
+    db.query("INSERT INTO videos (id, mimetype, title, caption) VALUES ($1, $2, $3, $4);", [file_uuid, fileName.slice(fileName.lastIndexOf(".")+1), req.body.title, req.body.caption?req.body.caption:null], (err) => {
+        if (err) {
             console.log(err.message)
+            res.status(500).json({ msg: err.message })
+        } else {
+            res.status(200).send("Successfully completed!")
+        }
 
-        res.redirect("/")
+        db.query("INSERT INTO uploads(upload_id, uploaded) VALUES ($1, $2)", [file_uuid, fs.readFileSync(`./uploads/videos/${fileName}`)], (err) => {
+            if (err)
+                console.log(err.message)
+        })
     })
 })
 
-app.use("/", express.static(path.join(__dirname, "uploads"))) // later: check if exists in sql download it; else not_found
+app.use("/", express.static(path.join(__dirname, "uploads"))) // later: check if exists from sql download it; else not_found
 app.get("/sql/videos/:video_id", (req, res) => {
     if (!req.params.video_id)
         return res.render("not_found")
 
-    db.query("SELECT video FROM videos WHERE id = $1", [req.params.video_id], (err, result) => {
+    db.query("SELECT video FROM uploads WHERE upload_id = $1", [req.params.video_id], (err, result) => {
         if (err) {
             console.log(err.message)
             return res.render("not_found")
