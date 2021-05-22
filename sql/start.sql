@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS videos (
     id UUID DEFAULT uuid_generate_v4 () PRIMARY KEY,
     mimetype TEXT NOT NULL,
     title TEXT NOT NULL,
-    caption TEXT,
+    description TEXT,
     uploadtype TEXT NOT NULL DEFAULT 'video'
 );
 CREATE TABLE IF NOT EXISTS uploads (

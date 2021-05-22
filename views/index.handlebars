@@ -39,11 +39,10 @@
     }
 </style>
 
-<div id="index">
-    <div id="body">
+<div id="index">    <div id="body">
         {{#each videos}}
             <h3>{{this.title}}</h3>
-            <h6>{{this.caption}}</h6>
+            <h6>{{this.description}}</h6>
             <video id="video" controls>
                 <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
             </video>

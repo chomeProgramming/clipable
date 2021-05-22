@@ -93,7 +93,7 @@ app.post("/upload", upload.single("video"), (req, res) => {
 
     const fileName = req.file.filename
     const file_uuid = fileName.slice(0, fileName.lastIndexOf("."))
-    db.query("INSERT INTO videos (id, mimetype, title, caption) VALUES ($1, $2, $3, $4);", [file_uuid, fileName.slice(fileName.lastIndexOf(".")+1), req.body.title, req.body.caption?req.body.caption:null], (err) => {
+    db.query("INSERT INTO videos (id, mimetype, title, description) VALUES ($1, $2, $3, $4);", [file_uuid, fileName.slice(fileName.lastIndexOf(".")+1), req.body.title, req.body.description?req.body.description:null], (err) => {
         if (err) {
             console.log(err.message)
             res.status(500).json({ msg: err.message })
