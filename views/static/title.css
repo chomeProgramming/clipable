@@ -53,30 +53,18 @@
 }
 
 
-/* first version: */
-/* for second version recomment all in this: */
-/* @media only screen and (max-width: 420px) { */
-    #header__login {
-        display: none;
-    }
-    .menu {
-        display: block;
-    }
-    /* first version uncomment this: */
-    /* #input {
-        display: none;
-    } */
-/* } */
-/* until this */
+#header__login {
+    display: none;
+}
+.menu {
+    display: block;
+}
 
-/* for second version delete this uncomment: */
 @media only screen and (max-width: 420px) {
     #input {
         display: none;
     }
 }
-/* until this */
-
 
 @media only screen and (max-width: 300px) {
     .menu {
