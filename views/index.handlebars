@@ -69,7 +69,7 @@
         {{#each videos}}
             <h3>{{this.caption}}</h3>
             <video id="video" controls>
-                <source src="/videos/{{this.id}}" type="video/mp4">
+                <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
             </video>
         {{/each}}
     </div>

@@ -108,7 +108,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Uploading...</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="uploadVideoModal.style.display = 'none';"></button>
+                    {{!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="uploadVideoModal.style.display = 'none';"></button> --}}
                 </div>
                 <div class="modal-body">
                     <div class="progress-bar">
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="stopUploadVideo" onclick="javascript:stopSubmitForm()">Stop</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="stopUploadVideo">Stop</button>
                     {{!-- <button type="button" class="btn btn-primary">Understood</button> --}}
                 </div>
             </div>
@@ -167,10 +167,19 @@
         })
 
         // xhr.setRequestHeader("Content-type", event.target.enctype)
+        // xhr.setRequestHeader("Content-type", "w-xxx-form-urlencoded")
+        xhr.setRequestHeader("enctype", event.target.enctype)
         xhr.send(new FormData(uploadVideo))
+        xhr.upload.onabort = () => {
+            window.location.href = "/create"
+        }
+        xhr.upload.onloadend = () => {
+            window.location.href = "/"
+        }
 
         stopUploadVideo.onclick = () => {
             xhr.abort()
+            window.location.href = "/create"
         }
     })
 </script>
