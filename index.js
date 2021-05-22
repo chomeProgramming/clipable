@@ -6,6 +6,17 @@ const fileUpload = require("express-fileupload")
 const { Pool, Client } = require("pg")
 const multer = require('multer')
 
+const app = express()
+const PORT = process.env.PORT || 2662
+
+const db = new Pool({
+    connectionString: require("./client").connectionString,
+    ssl: {
+        rejectUnauthorized: false
+    }
+})
+// db.connect()  // only at Client
+
 // const upload = multer({ dest: './uploads/' })
 const fileStorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -30,24 +41,17 @@ const upload = multer({ storage: fileStorageEngine })
 // multer example: https://www.youtube.com/watch?v=srPXMt1Q0nY
 // more info for multer in: multer_hint.txt
 
-const app = express()
-const PORT = process.env.PORT || 2662
-
-const db = new Pool({
-    connectionString: require("./client").connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
-// db.connect()  // only at Client
 const sqls = {
     start: fs.readFileSync("./sql/start.sql").toString(),
+}
+const displayNotFound = res => {
+    res.sendFile(path.join(__dirname, "./views/not_found.html"))
 }
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.engine("handlebars", exphbs({ defaultLayout: "" }))
+app.engine("handlebars", exphbs({ defaultLayout: "main" }))
 app.set("view engine", "handlebars")
 
 app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
@@ -80,11 +84,11 @@ app.get("/create", (req, res) => {
 app.post("/upload", upload.single("video"), (req, res) => {
     if (!req.file) {
         console.log("Error: Not get file from multer")
-        return res.render("not_found")
+        return displayNotFound(res)
     }
     if (!req.body.title) {
         console.log("Something is missing.")
-        return res.render("not_found")
+        return displayNotFound(res)
     }
 
     const fileName = req.file.filename
@@ -107,15 +111,15 @@ app.post("/upload", upload.single("video"), (req, res) => {
 app.use("/", express.static(path.join(__dirname, "uploads"))) // later: check if exists from sql download it; else not_found
 app.get("/sql/videos/:video_id", (req, res) => {
     if (!req.params.video_id)
-        return res.render("not_found")
+        return displayNotFound(res)
 
     db.query("SELECT video FROM uploads WHERE upload_id = $1", [req.params.video_id], (err, result) => {
         if (err) {
             console.log(err.message)
-            return res.render("not_found")
+            return displayNotFound(res)
         }
         if (result.rowCount == 0)
-            return res.render("not_found")
+            return displayNotFound(res)
 
         res.writeHead(200, {'Content-Type': 'video/mp4'});
         res.end(result.rows[0].video)  
@@ -127,7 +131,7 @@ app.get('/favicon.ico', (req, res) => {
     res.end(fs.readFileSync("./views/static/imgs/favicon.ico"))
 })
 app.get("*", (req, res) => {
-    res.render("not_found")
+    displayNotFound(res)
 })
 
 app.listen(PORT, () => {
