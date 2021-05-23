@@ -13,5 +13,21 @@ CREATE TABLE IF NOT EXISTS uploads (
         REFERENCES videos (id)
             ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS auth_users (
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT,
+    password TEXT NOT NULL,
+    isAdmin BOOLEAN DEFAULT FALSE,
+    timezone TEXT,
+    last_login DATE
+);
+CREATE TABLE IF NOT EXISTS auth_devices (
+    device_id TEXT NOT NULL PRIMARY KEY,
+    user_id INTEGER,
+    FOREIGN KEY (user_id)
+        REFERENCES auth_users (id)
+            ON DELETE SET NULL
+);
 
 -- channel_id (foreign key)

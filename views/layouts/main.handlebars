@@ -35,26 +35,33 @@
             <input type="text" class="input" placeholder="Search User" id="input"/>
 
             {{!-- <i class="material-icons own-menu-icon">&#xe5d2;</i> --}}
-            <div class="menu" onclick="openMenuBar()">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
             <div id="header__login">
                 {{#if authUser}}
-                    <button type="button" class="btn button">LOGOUT</button>
-                {{else}}
-                    <button type="button" class="btn button">LOGIN</button>
-                    <button type="button" class="btn button">SIGN UP</button>
+                    <a class="btn button" href="#">{{ authUser.username }}</a>
                 {{/if}}
+                {{!-- {{#if authUser}}
+                    <a class="btn button" href="/logout">LOGOUT</a>
+                {{else}}
+                    <a class="btn button" href="/login">LOGIN</a>
+                    <a class="btn button" href="/signup">SIGN UP</a>
+                {{/if}} --}}
+                <div class="menu" onclick="openMenuBar()">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
             </div>
             <div id="menuBar" class="menu-bar">
                 <a href="javascript:void(0)" class="closebtn" onclick="closeMenuBar()">&times;</a>
                 <div class="menu-content">
                     <h2 class="title-text">CLIPABLE</h2>
-                    <a href="#">Login</a>
-                    <a href="#">Sign Up</a>
-                    <a href="#">Profile</a>
+                    {{#if authUser}}
+                        <a href="#" class="title-text">{{authUser.username}}</a>
+                        <a href="/logout">Logout</a>
+                    {{else}}
+                        <a href="/login">Login</a>
+                        <a href="/signup">Sign Up</a>
+                    {{/if}}
                 </div>
             </div>
         </div>

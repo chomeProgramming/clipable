@@ -54,6 +54,7 @@ app.use(express.urlencoded({ extended: false }))
 app.engine("handlebars", exphbs({ defaultLayout: "main" }))
 app.set("view engine", "handlebars")
 
+app.use(require("./routes/user").getAuthUser)
 app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
 
 app.use((req, res, next) => {
@@ -70,9 +71,16 @@ app.get("/", (req, res) => {
             console.log(err.message)
         res.render("index", {
             title: "Clipable",
-            videos: result.rows
+            videos: result.rows,
+            authUser: req.body.authUser
         })
     })
+})
+app.use("/", require("./routes/user").router)
+
+app.get('/favicon.ico', (req, res) => {
+    res.writeHead(200, {'Content-Type': 'image/jpeg'});
+    res.end(fs.readFileSync("./views/static/imgs/favicon.ico"))
 })
 
 app.get("/post/", (req, res) => {
@@ -126,10 +134,6 @@ app.get("/sql/videos/:video_id", (req, res) => {
     })
 })
 
-app.get('/favicon.ico', (req, res) => {
-    res.writeHead(200, {'Content-Type': 'image/jpeg'});
-    res.end(fs.readFileSync("./views/static/imgs/favicon.ico"))
-})
 app.get("*", (req, res) => {
     displayNotFound(res)
 })
