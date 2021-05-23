@@ -23,9 +23,9 @@
     border-radius: 7.5px;
     color: white;
 }
+
 #body {
-    /* background-color: var(--main-bg-color); */
-    background-color: #333;
+    background-color: var(--main-bg-color);
     height: 100vh;
     position: relative;
     top: 0;
