@@ -94,8 +94,8 @@ app.post("/upload", upload.single("video"), (req, res) => {
         console.log("Error: Not get file from multer")
         return displayNotFound(res)
     }
-    if (!req.body.title) {
-        console.log("Something is missing.")
+    if (!req.body.title || typeof req.body.title !== "string" || typeof req.body.description !== "string") {
+        console.log("Something is missing or wrong data type.")
         return displayNotFound(res)
     }
 

@@ -41,15 +41,38 @@
         margin-left: 10px;
         font-weight: bold;
     }
+
+
+    .drag-drop-div {
+        background-color: #eee;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .drag-drop-div > * {
+        color: #333;
+    }
+    .drag-drop-div > label {
+        cursor: pointer;
+    }
 </style>
 
 {{!-- <div id="create">
     <div id="upload"> --}}
         <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-video">
             <div class="mb-3 upload-video" id="upload-div">
-                <input class="form-control" type="text" placeholder="TITLE" id="uploadCaption" name="title" maxlength="32">
-                <input class="form-control" type="text" placeholder="DESCRIPTION (Needn't to be filled)" name="description" maxlength="100">
-                <input type="file" class="form-control" accept="video/*" name="video" id="chooseUploadVideo">
+                <input class="form-control" type="text" placeholder="TITLE" id="uploadTitle" name="title" maxlength="32">
+                <input class="form-control" type="text" placeholder="DESCRIPTION (Needn't to be filled)" id="uploadDescription" name="description" maxlength="100">
+                <div class="drag-drop-div" id="dragDropDiv">
+                    <label for="chooseUploadVideo"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.<br>
+                        <p style="font-size: 12px; text-align: center;">You can only choose 1 video!</p>
+                    </label>
+                    <h3 id="fileChooseResult"></h3>
+                    <input type="file" style="display: none;" class="form-control" accept="video/*" name="video" id="chooseUploadVideo">
+                </div>
                 <button class="btn btn-primary" id="submitUpload" disabled>Upload</button>
             </div>
         </form>
@@ -80,6 +103,7 @@
     </div>
 </div>
 
+
 <script>
     const uploadVideoModal = document.querySelector("#uploadVideoModal")
     const stopUploadVideo = document.querySelector("#stopUploadVideo")
@@ -88,18 +112,54 @@
     const progressBar = document.querySelector("#progressBar")
     const progressBarSpan = document.querySelector("#progressBarSpan")
 
+    const dragDropDiv = document.querySelector("#dragDropDiv")
     const chooseUploadVideo = document.querySelector("#chooseUploadVideo")
-    const uploadCaption = document.querySelector("#uploadCaption")
+    const fileChooseResult = document.querySelector("#fileChooseResult")
+    const uploadTitle = document.querySelector("#uploadTitle")
     const submitUpload = document.querySelector("#submitUpload")
 
     const updateSubmitButton = () => {
-        if (uploadCaption.value == "" || chooseUploadVideo.value == "")
+        if (uploadTitle.value == "" || fileChooseResult.innerHTML == "")
             submitUpload.disabled = true
         else
             submitUpload.disabled = false
     }
-    uploadCaption.oninput = updateSubmitButton
-    chooseUploadVideo.oninput = updateSubmitButton
+    uploadTitle.oninput = updateSubmitButton
+    fileChooseResult.oninput = updateSubmitButton
+
+    let dragFileData = null
+
+
+    var isAdvancedUpload = function() {
+        var div = document.createElement('div');
+        return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    }();
+    chooseUploadVideo.addEventListener("input", e => {
+        dragFileData = null
+        fileChooseResult.innerHTML = e.target.value.split("\\")[e.target.value.split("\\").length-1]
+    })
+    if (isAdvancedUpload) {
+        dragDropDiv.ondrop = e => {
+            e.preventDefault()
+            var currentFile = e.dataTransfer.files[event.dataTransfer.files.length-1]
+            if (currentFile.type.split("/")[0] !== "video" || e.dataTransfer.files.length > 1)
+                return false
+            dragFileData = currentFile
+            fileChooseResult.innerHTML = currentFile.name
+            dragDropDiv.style = ""
+        }
+        dragDropDiv.ondragover = e => {
+            e.preventDefault()
+            var currentFile = e.dataTransfer.items[e.dataTransfer.items.length-1]
+            if (currentFile.type.split("/")[0] !== "video" || e.dataTransfer.items.length > 1)
+                return dragDropDiv.style = "border: 3px solid red;"
+            dragDropDiv.style = "border: 3px solid blue;"
+        }
+        dragDropDiv.ondragleave = e => {
+            e.preventDefault()
+            dragDropDiv.style.border = ""
+        }
+    }
 
     function closeModal() {
         chooseUploadVideo.value = ""
@@ -126,7 +186,16 @@
         // xhr.setRequestHeader("Content-type", event.target.enctype)
         // xhr.setRequestHeader("Content-type", "w-xxx-form-urlencoded")
         xhr.setRequestHeader("enctype", event.target.enctype)
-        xhr.send(new FormData(uploadVideo))
+        // var dataDropFile = chooseUploadVideo.getAttribute("data-drop-file")
+        if (dragFileData !== null) {
+            var newFormData = new FormData()
+            newFormData.append("title", uploadTitle.value)
+            newFormData.append("description", document.querySelector("#uploadDescription").value)
+            newFormData.append("video", dragFileData)
+            xhr.send(newFormData)
+        } else
+            xhr.send(new FormData(uploadVideo))
+
         xhr.upload.onabort = () => {
             window.location.href = "/create"
         }
