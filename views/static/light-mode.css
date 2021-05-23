@@ -1,0 +1,17 @@
+:root {
+    --main-bg-color: white;
+    --main-ui-color: #E9E9E9;
+    --main-button-color: #FD4D4D;
+}
+
+.menu * {
+    background-color: black;
+}
+
+.input {
+    background-color: var(--main-ui-color);
+    border: none;
+    padding: 5px;
+    border-radius: 7.5px;
+    color: black;
+}

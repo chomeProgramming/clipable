@@ -6,18 +6,71 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="/views/static/title.css" rel="stylesheet">
-        <link href="/views/static/style.css" rel="stylesheet">
+        <link href="/views/static/main.css" rel="stylesheet">
+        <link href="" rel="stylesheet" id="themeStylesheet">
         <link href="/favicon.ico" rel="icon">
 
+        <script src="/views/static/main.js"></script>
         <script>
-            let menuBar = {}
-            document.addEventListener("DOMContentLoaded", () => {
-                menuBar = document.querySelector("#menuBar")
+            document.addEventListener("DOMContentLoaded", async () => {
+                await fetch("/authUser", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                })
+                    .then(result => result.json())
+                    .then(authUser => {
+                        document.body.setAttribute("data-auth-user", JSON.stringify(authUser))
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+
+                const menuBar = document.querySelector("#menuBar")
+
+                const themeSelect = document.getElementById("themeSelect")
+                const themeStylesheet = document.getElementById("themeStylesheet")
+
+                themeSelect.addEventListener("change", function (e) {
+                    localStorage.setItem("theme-color", this.value)
+                    themeStylesheet.href = "/views/static/" + this.value + ".css"
+                    closeMenuBar()
+                })
+
+                document.querySelector(`#themeSelect option[value=${localStorage.getItem("theme-color")}]`).selected = true
+
+
+                const authUser = JSON.parse(document.body.getAttribute("data-auth-user"))
+                const headerLogin = document.querySelector("#header__login")
+                if (authUser) {
+                    const aUsername = `<a class="btn button" href="#">${authUser.username}</a>`
+                    headerLogin.innerHTML = aUsername + headerLogin.innerHTML
+                }
+                const menuContent = document.querySelectorAll(".menu-content")[0]
+                let insert
+                if (authUser)
+                    insert = `<a href="#" class="title-text">${authUser.username}</a>
+                        <a href="/logout">Logout</a>
+                        <a href="/create">Create</a>`
+                else
+                    insert = `<a href="/login">Login</a>
+                        <a href="/signup">Sign Up</a>`
+                
+                let menuContentChildren = []
+                for (var i = 0; i < menuContent.children.length; i++) {
+                    menuContentChildren.push(menuContent.children.item(i))
+                }
+                menuContent.innerHTML = ""
+                menuContent.appendChild(menuContentChildren[0])
+                menuContent.innerHTML = menuContent.innerHTML + insert
+                menuContentChildren.slice(1).forEach(child => {
+                    menuContent.appendChild(child)
+                })
             })
+
             function openMenuBar() {
-                    menuBar.style.width = "100%"
+                menuBar.style.width = "100%"
             }
+
             function closeMenuBar() {
                 menuBar.style.width = "0%"
             }
@@ -29,22 +82,13 @@
         <div id="header">
             <div id="header__image">
                 <img src="../views/static/imgs/logo.png" alt="404 NOT FOUND" style="max-width: 85px; max-height: 75%;">
-                <h2 class="title-text">CLIPABLE</h2>
+                <h3 class="title-text">Clipable</h3>
             </div>
 
             <input type="text" class="input" placeholder="Search User" id="input"/>
 
             {{!-- <i class="material-icons own-menu-icon">&#xe5d2;</i> --}}
             <div id="header__login">
-                {{#if authUser}}
-                    <a class="btn button" href="#">{{ authUser.username }}</a>
-                {{/if}}
-                {{!-- {{#if authUser}}
-                    <a class="btn button" href="/logout">LOGOUT</a>
-                {{else}}
-                    <a class="btn button" href="/login">LOGIN</a>
-                    <a class="btn button" href="/signup">SIGN UP</a>
-                {{/if}} --}}
                 <div class="menu" onclick="openMenuBar()">
                     <div></div>
                     <div></div>
@@ -54,21 +98,22 @@
             <div id="menuBar" class="menu-bar">
                 <a href="javascript:void(0)" class="closebtn" onclick="closeMenuBar()">&times;</a>
                 <div class="menu-content">
-                    <h2 class="title-text">CLIPABLE</h2>
-                    {{#if authUser}}
-                        <a href="#" class="title-text">{{authUser.username}}</a>
-                        <a href="/logout">Logout</a>
-                    {{else}}
-                        <a href="/login">Login</a>
-                        <a href="/signup">Sign Up</a>
-                    {{/if}}
+                    <h1 class="title-text">CLIPABLE</h1>
+                    <form action="./" method="post">
+                        <select name="themeSelect" id="themeSelect">
+                            <option value="dark-mode" class="option">DARK MODE</option>
+                            <option value="light-mode" class="option">LIGHT MODE</option>
+                            <option value="light-mode-with-shadow" class="option">LIGHT MODE WITH SHADOW</option>
+                        </select>
+                    </form>
                 </div>
             </div>
         </div>
-        <div id="body">
+
+        {{!-- <div id="body"> --}}
             {{!-- <div id="upload"> --}}
                 {{{ body }}}
             {{!-- </div> --}}
-        </div>
+        {{!-- </div> --}}
     </body>
 </html>

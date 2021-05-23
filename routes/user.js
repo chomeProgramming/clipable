@@ -91,8 +91,14 @@ router.post("/signup", (req, res) => {
         })
     })
 })
-router.get("/currentAuthUser", (req, res) => {
+router.post("/authUser", (req, res) => {
     res.json(req.body.authUser)
+})
+
+router.get('/profile', (req, res) => {
+    res.render("profile", {
+        title: "Profile"
+    })
 })
 
 const getAuthUser = (req, res, next) => {

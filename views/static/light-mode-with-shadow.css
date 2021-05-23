@@ -1,0 +1,28 @@
+:root {
+    --main-bg-color: white;
+    --main-ui-color: #E9E9E9;
+    --main-button-color: #FD4D4D;
+}
+
+#header {
+    box-shadow: 10px 10px 20px grey;
+}
+
+#body {
+    background-color: var(--main-bg-color);
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.menu * {
+    background-color: black;
+}
+
+.input {
+    background-color: var(--main-ui-color);
+    border: none;
+    padding: 5px;
+    border-radius: 7.5px;
+    color: black;
+}

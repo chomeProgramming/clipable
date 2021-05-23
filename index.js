@@ -72,7 +72,6 @@ app.get("/", (req, res) => {
         res.render("index", {
             title: "Clipable",
             videos: result.rows,
-            authUser: req.body.authUser
         })
     })
 })
@@ -86,9 +85,11 @@ app.get('/favicon.ico', (req, res) => {
 app.get("/post/", (req, res) => {
     res.render("post")
 })
+
 app.get("/create", (req, res) => {
     res.render("upload")
 })
+
 app.post("/upload", upload.single("video"), (req, res) => {
     if (!req.file) {
         console.log("Error: Not get file from multer")
