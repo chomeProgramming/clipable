@@ -111,12 +111,22 @@ body {
     border-radius: 15px;
     background-color: white;
     margin: 6px 0;
+    transition: 0.4s;
+}
+.menu-hover .menu-top {
+    -webkit-transform: rotate(-45deg) translate(-9px, 6px);
+    transform: rotate(-45deg) translate(-9px, 6px);
+}
+.menu-hover .menu-middle {opacity: 0;}
+.menu-hover .menu-bottom {
+    -webkit-transform: rotate(45deg) translate(-8px, -8px);
+    transform: rotate(45deg) translate(-8px, -8px);
 }
 
-.menu:hover {
+/* .menu:hover {
     animation-name: animation;
     animation-duration: 2s;
-}
+} */
 .menu-bar {
     height: 100%;
     width: 0;

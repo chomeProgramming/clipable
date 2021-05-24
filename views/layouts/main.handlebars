@@ -79,6 +79,12 @@
             function closeMenuBar() {
                 menuBar.style.width = "0%"
             }
+            function menuIconHover(x) {
+                x.classList.add("menu-hover")
+            }
+            function menuIconUnHover(x) {
+                x.classList.remove("menu-hover")
+            }
         </script>
 
         <title>{{ title }}</title>
@@ -94,10 +100,10 @@
 
             {{!-- <i class="material-icons own-menu-icon">&#xe5d2;</i> --}}
             <div id="header__login">
-                <div class="menu" onclick="openMenuBar()">
-                    <div id="top"></div>
-                    <div id="middle"></div>
-                    <div id="bottom"></div>
+                <div class="menu" onclick="openMenuBar()" onmouseover="menuIconHover(this)" onmouseout="menuIconUnHover(this)">
+                    <div class="menu-top"></div>
+                    <div class="menu-middle"></div>
+                    <div class="menu-bottom"></div>
                 </div>
             </div>
             <div id="menuBar" class="menu-bar">
