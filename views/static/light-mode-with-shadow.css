@@ -2,10 +2,12 @@
     --main-bg-color: white;
     --main-ui-color: #E9E9E9;
     --main-button-color: #FD4D4D;
+    --main-text-color: black;
 }
 
 #header {
-    box-shadow: 10px 10px 20px grey;
+    /* box-shadow: 10px 10px 20px grey; */
+    box-shadow: 5px 5px 10px grey;
 }
 
 #body {

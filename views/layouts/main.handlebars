@@ -10,6 +10,8 @@
         <link href="" rel="stylesheet" id="themeStylesheet">
         <link href="/favicon.ico" rel="icon">
 
+        <title>CLIPABLE</title>
+
         <script src="/views/static/main.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", async () => {
@@ -39,7 +41,9 @@
 
                 document.querySelector(`#themeSelect option[value=${localStorage.getItem("theme-color")}]`).selected = true
 
-
+                setUpAuthUser()
+            })
+            function setUpAuthUser() {
                 const authUser = JSON.parse(document.body.getAttribute("data-auth-user"))
                 const headerLogin = document.querySelector("#header__login")
                 if (authUser) {
@@ -66,7 +70,7 @@
                 menuContentChildren.slice(1).forEach(child => {
                     menuContent.appendChild(child)
                 })
-            })
+            }
 
             function openMenuBar() {
                 menuBar.style.width = "100%"

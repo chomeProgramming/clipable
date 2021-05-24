@@ -2,6 +2,7 @@
     --main-bg-color: #0B0E11;
     --main-ui-color: #151A21;
     --main-button-color: #FD4D4D;
+    --main-text-color: white;
 }
 
 .button {
@@ -50,6 +51,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 25px;
 }
 
 #header__login {
@@ -115,45 +117,6 @@ body {
     animation-name: animation;
     animation-duration: 2s;
 }
-
-@keyframes animation {
-    from   {  transform: rotate(0deg); }
-    to   {  transform: rotate(360deg); }
-}
-
-@media only screen and (max-width: 600px) {
-    #header__login {
-        margin-right: 5px;
-    }
-}
-
-@media only screen and (max-width: 560px) {
-    #input {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 350px) {
-    .menu {
-        margin-right: 5px;
-    }
-}
-
-@media only screen and (max-width: 350px) {
-    #header__image h2 {
-        display: none;
-    }
-    .menu {
-        margin-right: 20px;
-    }
-}
-
-@media only screen and (max-width: 260px) {
-    #header__login > a {
-        display: none;
-    }
-}
-
 .menu-bar {
     height: 100%;
     width: 0;
@@ -201,5 +164,43 @@ body {
         font-size: 40px;
         top: 15px;
         right: 35px;
+    }
+}
+
+@keyframes animation {
+    from   {  transform: rotate(0deg); }
+    to   {  transform: rotate(360deg); }
+}
+
+@media only screen and (max-width: 600px) {
+    #header__login {
+        margin-right: 5px;
+    }
+}
+
+@media only screen and (max-width: 560px) {
+    #input {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    .menu {
+        margin-right: 5px;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    #header__image h3 {
+        display: none;
+    }
+    .menu {
+        margin-right: 20px;
+    }
+}
+
+@media only screen and (max-width: 260px) {
+    #header__login > a {
+        display: none;
     }
 }

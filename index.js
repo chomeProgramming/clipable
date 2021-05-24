@@ -8,7 +8,8 @@ const { Pool, Client } = require("pg")
 const multer = require('multer')
 const csrf = require("csurf")
 const session = require("express-session")
-const authorize = require("./routes/authorization-middleware")
+const cookieParser = require("cookie-parser")
+// const authorize = require("./routes/authorization-middleware")
 
 const app = express()
 const PORT = process.env.PORT || 2662
@@ -58,7 +59,9 @@ app.use(express.urlencoded({ extended: false }))
 app.engine("handlebars", exphbs({ defaultLayout: "main" }))
 app.set("view engine", "handlebars")
 
+app.use(cookieParser())
 app.use(session({ secret: require("./config.js").JWT_SECRET, resave: false, saveUninitialized: false }))
+// app.use(csrf({ cookie: true }))
 app.use(csrf())
 
 app.use(require("./routes/user").getAuthUser)
@@ -106,19 +109,31 @@ app.get('/favicon.ico', (req, res) => {
     res.end(fs.readFileSync("./views/static/imgs/favicon.ico"))
 })
 
-app.get("/post/", (req, res) => {
-    res.render("post", {
-        csrfToken: req.csrfToken
+app.get("/post/:id", (req, res) => {
+    db.query("SELECT * FROM videos WHERE id = $1", [req.params.id], (err, { rows }) => {
+        if (err) {
+            console.log(err)
+            return res.redirect("/")
+        }
+        if (rows.length !== 1)
+            return res.render("not_found")
+
+        res.render("post", {
+            csrfToken: req.csrfToken,
+            video: rows[0]
+        })  
     })
 })
 
-app.get("/create", authorize(["customer.create", "customer:default"]), (req, res) => {
+// app.get("/create", authorize(["customer.create", "customer:default"]), (req, res) => {
+app.get("/create", (req, res) => {
     res.render("upload", {
         csrfToken: req.csrfToken
     })
 })
 
-app.post("/upload", authorize(["customer:create", "customer:default"]), upload.single("video"), (req, res) => {
+// app.post("/upload", authorize(["customer:create", "customer:default"]), upload.single("video"), (req, res) => {
+app.post("/upload", upload.single("video"), (req, res) => {
     if (!req.file) {
         console.log("Error: Not get file from multer")
         return displayNotFound(res)

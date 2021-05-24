@@ -1,30 +1,61 @@
 <style>
-    #body {
+    body {
         background-color: var(--main-bg-color);
-        height: 100vh;
+        min-height: 100vh;
+        padding-bottom: 100px;
     }
 
-    #video {
-        max-width: 75%;
-        max-height: 75%;
+    #video-container {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        left: 50%;
+        transform: translate(-50%, 0);
+        background-color: var(--main-ui-color);
+        border-radius: 15px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        resize: horizontal;
+
+        width: 80vh;
+        min-width: 40vh;
+        max-width: 100vh;
+        /* resize: both; */
+        overflow: auto;
+    }
+
+    #video-video {
+        /*max-width: 85vh;*/
+        width: 100%;
+        max-height: 85vh;
+    }
+
+    #video-title, #video-desc {
+        padding: 10px;
+        color: var(--main-text-color);
     }
 
     @media only screen and (max-width: 600px) {
-        #video {
+        #video-container {
+            width: 100%;
+        }
+        #video-video {
             max-width: 100%;
-            max-height: 100%;
         }
     }
 </style>
 
-<html>
-    <div id="body">
-        <div>
-            <video id="video" controls>
-                <source src="/views/static/videos/example.mp4" type="video/mp4">
-            </video>
-        </div>
-    </div>
-</html>
+<div id="video-container">
+    <h1 id="video-title">{{ video.title }}</h1>
+    <video id="video-video" controls controlsList="nodownload">
+        <source src="/videos/{{video.id}}.{{video.mimetype}}">
+    </video>
+    <h4>
+        {{#if video.description}}
+            <h6 id="video-desc">{{ video.description }}</h6>
+        {{else}}
+            <h6 id="video-desc">No description.</h6>
+        {{/if}}
+    </h4>
+</div>
 
 {{!-- https://www.youtube.com/watch?v=MxfxiR8TVNU --}}
