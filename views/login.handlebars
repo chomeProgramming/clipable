@@ -4,6 +4,7 @@
             <div class="box shadow bg-white p-4">
                 <h3 class="mb-4 text-center fs-1">{{ title }}</h3>
                 <form action="/login" method="POST" class="mb-3">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <h9 style="color: red; text-align: center;">{{ errMessage }}</h9>
                     <h9 style="color: green; text-align: center;">{{ okMessage }}</h9>
                     <div class="form-floating mb-3">

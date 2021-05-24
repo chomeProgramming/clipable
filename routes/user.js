@@ -25,7 +25,7 @@ const outputError = (req, error) => {
     errMessage = error
     inputData = req.body
 }
-const forbiddenLoggedOut = ["/logout"]
+const forbiddenLoggedOut = ["/logout", "/create"]
 const forbiddenLoggedIn = ["/login", "/signup"]
 
 router.get("/login", (req, res) => {
@@ -34,20 +34,24 @@ router.get("/login", (req, res) => {
         title: "Login",
         errMessage: errMessage,
         inputData: inputData,
+        csrfToken: req.csrfToken
     })
     errMessage = ""
     inputData = {}
 })
+
 router.get("/signup", (req, res) => {
     res.render("signup", {
         layout: "user",
         title: "Sign Up",
         errMessage: errMessage,
         inputData: inputData,
+        csrfToken: req.csrfToken
     })
     errMessage = ""
     inputData = {}
 })
+
 router.get("/logout", (req, res) => {
     db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [DEVICE_ID], (err) => {
         if (err)
@@ -55,6 +59,7 @@ router.get("/logout", (req, res) => {
         res.redirect("/logout")
     })
 })
+
 router.post("/login", (req, res) => {
     if (!req.body.username_email || !req.body.password) {
         outputError(req, "Something is missing.")
@@ -69,6 +74,7 @@ router.post("/login", (req, res) => {
         res.redirect("/login")
     })
 })
+
 router.post("/signup", (req, res) => {
     if (!req.body.username || !req.body.password || !req.body.confirm_password) {
         outputError(req, "Something is missing.")
@@ -91,13 +97,15 @@ router.post("/signup", (req, res) => {
         })
     })
 })
+
 router.post("/authUser", (req, res) => {
     res.json(req.body.authUser)
 })
 
 router.get('/profile', (req, res) => {
     res.render("profile", {
-        title: "Profile"
+        title: "Profile",
+        csrfToken: req.csrfToken
     })
 })
 
@@ -134,3 +142,7 @@ module.exports = {
     router,
     getAuthUser
 }
+
+
+
+// use csrf_token: https://www.youtube.com/watch?v=3v6v6w4MBUw

@@ -16,6 +16,7 @@
                 await fetch("/authUser", {
                     method: "POST",
                     headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ _csrf: "{{csrfToken}}" })
                 })
                     .then(result => result.json())
                     .then(authUser => {
@@ -85,7 +86,7 @@
                 <h3 class="title-text">Clipable</h3>
             </div>
 
-            <input type="text" class="input" placeholder="Search User" id="input"/>
+            <input type="text" class="input" placeholder="CLIP ID" id="input"/>
 
             {{!-- <i class="material-icons own-menu-icon">&#xe5d2;</i> --}}
             <div id="header__login">

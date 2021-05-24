@@ -1,10 +1,14 @@
 const express = require("express")
 const exphbs = require("express-handlebars")
+const jwt = require("jsonwebtoken")
 const fs = require("fs")
 const path = require("path")
 const fileUpload = require("express-fileupload")
 const { Pool, Client } = require("pg")
 const multer = require('multer')
+const csrf = require("csurf")
+const session = require("express-session")
+const authorize = require("./routes/authorization-middleware")
 
 const app = express()
 const PORT = process.env.PORT || 2662
@@ -54,6 +58,9 @@ app.use(express.urlencoded({ extended: false }))
 app.engine("handlebars", exphbs({ defaultLayout: "main" }))
 app.set("view engine", "handlebars")
 
+app.use(session({ secret: require("./config.js").JWT_SECRET, resave: false, saveUninitialized: false }))
+app.use(csrf())
+
 app.use(require("./routes/user").getAuthUser)
 app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
 
@@ -72,10 +79,27 @@ app.get("/", (req, res) => {
         res.render("index", {
             title: "Clipable",
             videos: result.rows,
+            csrfToken: req.csrfToken
         })
     })
 })
+
 app.use("/", require("./routes/user").router)
+
+app.post("/token", (req, res) => {
+    let payload = {}
+    if (req.body.authUser)
+        payload = {
+            authUser: req.body.authUser,
+            scopes: ["customer:default"]
+        }
+    else
+        payload = {
+            scopes: ["customer:read"]
+        }
+    const token = jwt.sign(payload, require("./config").JWT_SECRET)
+    res.send(token)
+})
 
 app.get('/favicon.ico', (req, res) => {
     res.writeHead(200, {'Content-Type': 'image/jpeg'});
@@ -83,14 +107,18 @@ app.get('/favicon.ico', (req, res) => {
 })
 
 app.get("/post/", (req, res) => {
-    res.render("post")
+    res.render("post", {
+        csrfToken: req.csrfToken
+    })
 })
 
-app.get("/create", (req, res) => {
-    res.render("upload")
+app.get("/create", authorize(["customer.create", "customer:default"]), (req, res) => {
+    res.render("upload", {
+        csrfToken: req.csrfToken
+    })
 })
 
-app.post("/upload", upload.single("video"), (req, res) => {
+app.post("/upload", authorize(["customer:create", "customer:default"]), upload.single("video"), (req, res) => {
     if (!req.file) {
         console.log("Error: Not get file from multer")
         return displayNotFound(res)
@@ -118,6 +146,7 @@ app.post("/upload", upload.single("video"), (req, res) => {
 })
 
 app.use("/", express.static(path.join(__dirname, "uploads"))) // later: check if exists from sql download it; else not_found
+
 app.get("/sql/videos/:video_id", (req, res) => {
     if (!req.params.video_id)
         return displayNotFound(res)
