@@ -15,10 +15,10 @@ const getAuthUserSQL = fs.readFileSync("./sql/getAuthUser.sql").toString()
 const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split(";")
 const loginSQL = fs.readFileSync("./sql/login.sql").toString()
 
-let DEVICE_ID
-machineId().then(id => {
-    DEVICE_ID = id
-})
+// let DEVICE_ID
+// machineId().then(id => {
+//     DEVICE_ID = id
+// })
 let errMessage = ""
 let inputData = {}
 let successMessage = ""
@@ -57,19 +57,19 @@ router.get("/signup", (req, res) => {
 })
 
 router.get("/logout", (req, res) => {
-    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [DEVICE_ID], (err) => {
+    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [req.body.authUser.device_id], (err) => {
         if (err)
             console.log(err.message)
         res.redirect("/logout")
     })
 })
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
     if (!req.body.username_email || !req.body.password) {
         outputError(req, "Something is missing.")
         return res.redirect("/login")
     }
-    db.query(loginSQL, [req.body.username_email, md5(req.body.password), DEVICE_ID], (err, result) => {
+    db.query(loginSQL, [req.body.username_email, md5(req.body.password), await machineId()], (err, result) => {
         if (err)
             console.log(err.message)
         if (result.rowCount == 0 || !result.rows[0].user_id)
@@ -89,14 +89,14 @@ router.post("/signup", (req, res) => {
         return res.redirect("/signup")
     }
 
-    db.query(signupSQL[0], [req.body.username, md5(req.body.password), req.body.email, false], (err, newUser) => {
+    db.query(signupSQL[0], [req.body.username, md5(req.body.password), req.body.email, false], async (err, newUser) => {
         if (err) {
             console.log(err.message)
             outputError(req, "Username already exist.")
             return res.redirect("/signup")
         }
 
-        db.query(signupSQL[2], [newUser.rows[0].id, DEVICE_ID], (err) => {
+        db.query(signupSQL[2], [newUser.rows[0].id, await machineId()], (err) => {
             if (err) {
                 outputError(req, err.message)
                 return res.redirect("/signup")
@@ -177,7 +177,8 @@ router.get("/user/:username", (req, res) => {
     })
 })
 
-const getAuthUser = (req, res, next) => {
+const getAuthUser = async (req, res, next) => {
+    const DEVICE_ID = await machineId()
     db.query("SELECT * FROM auth_devices WHERE device_id = $1", [DEVICE_ID], (err, result) => {
         if (err) {
             console.log("Error: "+err.message)
