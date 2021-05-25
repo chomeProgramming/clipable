@@ -14,7 +14,6 @@ const db = new Pool({
 const getAuthUserSQL = fs.readFileSync("./sql/getAuthUser.sql").toString()
 const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split(";")
 const loginSQL = fs.readFileSync("./sql/login.sql").toString()
-const resetPasswordSQL = fs.readFileSync("./sql/resetPassword.sql").toString()
 
 let DEVICE_ID
 machineId().then(id => {
@@ -23,8 +22,11 @@ machineId().then(id => {
 let errMessage = ""
 let inputData = {}
 const outputError = (req, error) => {
-    errMessage = error
+    errMessage = "*" + error
     inputData = req.body
+}
+const displayNotFound = res => {
+    res.sendFile(path.join(__dirname, "./views/not_found.html"))
 }
 const forbiddenLoggedOut = ["/logout", "/create", "/profile"]
 const forbiddenLoggedIn = ["/login", "/signup"]
@@ -103,7 +105,7 @@ router.post("/authUser", (req, res) => {
     res.json(req.body.authUser)
 })
 
-router.get('/profile', (req, res) => {
+router.get("/profile", (req, res) => {
     res.render("profile", {
         title: "Profile",
         csrfToken: req.csrfToken,
@@ -111,18 +113,57 @@ router.get('/profile', (req, res) => {
     })
     errMessage = ""
 })
-router.post('/profile', (req, res) => {
-    if (!req.body.old_password || !req.body.new_password) {
+router.post("/profile", (req, res) => {
+    if (!req.body.password) {
         outputError(req, "Something is missing.")
         return res.redirect("/profile")
     }
-    db.query(resetPasswordSQL, [md5(req.body.new_password), req.body.authUser.user_id, md5(req.body.old_password)], (err, result) => {
+    let reset_type = null
+    if (req.body.new_username)
+        reset_type = "new_username"
+    else if (req.body.new_email)
+        reset_type = "new_email"
+    else if (req.body.new_password)
+        reset_type = "new_password"
+    if (!reset_type) {
+        outputError(req, "Nothing given.")
+        return res.redirect("/profile")
+    }
+
+    let reset_value = reset_type == "new_password" ? md5(req.body[reset_type]) : req.body[reset_type]
+    db.query("SELECT username FROM auth_users WHERE username != $1", [req.body.authUser.username], (err, users_usernames) => {
         if (err)
             console.log(err)
-        if (result.rowCount == 0) {
-            outputError(req, "Wrong password.")
+
+        if (reset_type == "new_username" && users_usernames.includes(reset_value)) {
+            outputError(req, "Username already exists.")
+            return res.redirect("/profile")
         }
-        res.redirect("/profile")
+        db.query(`UPDATE auth_users SET ${reset_type} = $1 WHERE id = $2 AND password = $3 RETURNING *`, [reset_value, req.body.authUser.user_id, md5(req.body.password)], (err, result) => {
+            if (err)
+                console.log(err)
+            if (result.rowCount == 0) {
+                outputError(req, "Wrong password.")
+            } else {
+                
+            }
+            res.redirect("/profile")
+        })  
+    })
+})
+router.get("/user/:username", (req, res) => {
+    if (!req.params.username)
+        return displayNotFound(req)
+    db.query("SELECT * FROM auth_users WHERE username = $1", [req.params.username], (err, result) => {
+        if (err)
+            console.log(err)
+        if (result.rowCount !== 1)
+            return displayNotFound(req)
+
+        res.render("user", {
+            csrfToken: req.csrfToken(),
+            currentUser: result.rows[0]
+        })
     })
 })
 

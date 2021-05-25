@@ -1,13 +1,35 @@
-<h1 id="user-username">Username: </h1>
-<h1 id="user-email">Email: </h1>
+<div class="background" id="info">
+    <div>
+        <h3 id="user-username" class="text">Username: </h3>
+        <h3 id="user-email" class="text">Email: </h3>
+    </div>
 
-<form action="/profile" method="POST" style="text-align: center;">
-    <h9 style="color: red; text-align: center;">{{ errMessage }}</h9>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <input type="password" class="form-control" name="old_password" placeholder="Old Password">
-    <input type="password" class="form-control" name="new_password" placeholder="New Password">
-    <button type="submit" class="btn btn-primary">Reset Password</button>
-</form>
+    <div>
+        <h9 style="color: red; text-align: center;">{{ errMessage }}</h9>
+        <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <input type="username" class="input" name="new_username" placeholder="New username">
+
+            <input type="password" class="input" name="password" placeholder="Password">
+            <button type="submit" class="btn button">Change Username</button>
+        </form>
+
+        <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <input type="email" class="input" name="new_email" placeholder="New email">
+
+            <input type="password" class="input" name="password" placeholder="Password">
+            <button type="submit" class="btn button">Change Email</button>
+        </form>
+
+        <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <input type="password" class="input" name="password" placeholder="Old password">
+            <input type="password" class="input" name="new_password" placeholder="New password">
+            <button type="submit" class="btn button">Change Password</button>
+        </form>
+    </div>
+</div>
 
 <script>
     function getUserElement(id) {

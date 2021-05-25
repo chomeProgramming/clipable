@@ -11,6 +11,14 @@
     font-weight: 700;
 }
 
+.text {
+    color: var(--main-text-color);
+}
+
+.background {
+    background-color: var(--main-ui-color);
+}
+
 .button:hover {
     background-color: var(--main-button-color);
     color: rgb(212, 212, 212);
@@ -27,6 +35,24 @@
 
 body {
     background-color: var(--main-bg-color);
+}
+
+#info {
+    border-radius: 20px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#info > div {
+    padding: 20px;
+}
+
+#info-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #body {

@@ -1,0 +1,11 @@
+<div class="background" id="info">
+    <div>
+        <div id="info-main">
+            <h2 class="text">{{ currentUser.username }}</h2>
+            {{#if currentUser.isAdmin }}
+                <h5 class="title-text">ADMIN</h5>
+            {{/if}}
+        </div>
+        <h6 class="text">"NUMBER OF UPLOADS" total uploads</h6>
+    </div>
+</div>
