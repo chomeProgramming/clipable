@@ -21,6 +21,7 @@ machineId().then(id => {
 })
 let errMessage = ""
 let inputData = {}
+let successMessage = ""
 const outputError = (req, error) => {
     errMessage = "*" + error
     inputData = req.body
@@ -74,7 +75,11 @@ router.post("/login", (req, res) => {
         if (result.rowCount == 0 || !result.rows[0].user_id)
             outputError(req, "Wrong username, email or password.")
 
-        res.redirect("/login")
+        db.query("UPDATE auth_users SET last_login = (SELECT CURRENT_TIMESTAMP) WHERE id = $1", [result.rows[0].user_id], (err) => {
+            if (err)
+                console.log(err)
+            res.redirect("/login")
+        })
     })
 })
 
@@ -109,9 +114,13 @@ router.get("/profile", (req, res) => {
     res.render("profile", {
         title: "Profile",
         csrfToken: req.csrfToken,
-        errMessage
+        errMessage,
+        successMessage,
+        inputData
     })
     errMessage = ""
+    successMessage = ""
+    inputData = {}
 })
 router.post("/profile", (req, res) => {
     if (!req.body.password) {
@@ -134,18 +143,19 @@ router.post("/profile", (req, res) => {
     db.query("SELECT username FROM auth_users WHERE username != $1", [req.body.authUser.username], (err, users_usernames) => {
         if (err)
             console.log(err)
-
+        
+        users_usernames = users_usernames.rows.map(user => user.username)
         if (reset_type == "new_username" && users_usernames.includes(reset_value)) {
             outputError(req, "Username already exists.")
             return res.redirect("/profile")
         }
-        db.query(`UPDATE auth_users SET ${reset_type} = $1 WHERE id = $2 AND password = $3 RETURNING *`, [reset_value, req.body.authUser.user_id, md5(req.body.password)], (err, result) => {
+        db.query(`UPDATE auth_users SET ${reset_type.slice(4)} = $1 WHERE id = $2 AND password = $3 RETURNING *`, [reset_value, req.body.authUser.user_id, md5(req.body.password)], (err, result) => {
             if (err)
                 console.log(err)
-            if (result.rowCount == 0) {
+            if (result && result.rowCount == 0) {
                 outputError(req, "Wrong password.")
             } else {
-                
+                successMessage = "*Successfully changed"
             }
             res.redirect("/profile")
         })  
@@ -158,10 +168,10 @@ router.get("/user/:username", (req, res) => {
         if (err)
             console.log(err)
         if (result.rowCount !== 1)
-            return displayNotFound(req)
+            return res.send(`Sorry, but this a user with this username does not exist.\nMaybe you have written it wrong.`)
 
         res.render("user", {
-            csrfToken: req.csrfToken(),
+            csrfToken: req.csrfToken,
             currentUser: result.rows[0]
         })
     })

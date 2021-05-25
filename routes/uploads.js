@@ -48,7 +48,7 @@ router.get("/post/:id", (req, res) => {
         res.render("post", {
             csrfToken: req.csrfToken,
             video: rows[0]
-        })  
+        })
     })
 })
 

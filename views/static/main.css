@@ -14,7 +14,6 @@
 .text {
     color: var(--main-text-color);
 }
-
 .background {
     background-color: var(--main-ui-color);
 }
@@ -25,7 +24,7 @@
     font-weight: 700;
 }
 
-.input {
+.search-user-input {
     background-color: var(--main-ui-color);
     border: none;
     padding: 5px;
@@ -35,14 +34,16 @@
 
 body {
     background-color: var(--main-bg-color);
+    padding-bottom: 100px;
 }
 
 #info {
     border-radius: 20px;
-    position: absolute;
+    position: relative;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    max-width: 90%;
+    transform: translate(-50%, 0);
 }
 
 #info > div {
@@ -53,6 +54,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.reset-forms-container > form input {
+    padding: 5px;
+    border: 1px solid gray;
+}
+.reset-forms-container > form button {
+    width: 75px;
 }
 
 #body {
@@ -217,8 +225,18 @@ body {
 }
 
 @media only screen and (max-width: 560px) {
-    #input {
+    .search-user-input {
         display: none;
+    }
+}
+
+@media only screen and (max-width: 485px) {
+    .reset-forms-container > form {
+        display: flex;
+        flex-direction: column;
+    }
+    .reset-forms-container > form button {
+        align-self: center;
     }
 }
 

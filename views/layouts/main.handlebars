@@ -58,6 +58,7 @@
 
                 setUpAuthUser()
                 headerImgNavigation()
+                searchUserInput()
             })
             function setUpAuthUser() {
                 const authUser = JSON.parse(document.body.getAttribute("data-auth-user"))
@@ -92,6 +93,15 @@
                     item.onclick = () => window.location.href = "/"
                 })
             }
+            function searchUserInput() {
+                const lv_searchUserInput = document.querySelector("#search-user-input")
+                lv_searchUserInput.parentElement.onsubmit = e => {
+                    e.preventDefault()
+                    if (lv_searchUserInput.value == "")
+                        return alert("If you want to search a user by its username,\nyou must enter something.")
+                    window.location.href = "/user/" + lv_searchUserInput.value
+                }
+            }
 
             function openMenuBar() {
                 menuBar.style.width = "100%"
@@ -117,7 +127,9 @@
                 <h3 class="title-text">Clipable</h3>
             </div>
 
-            <input type="text" class="input" placeholder="USERNAME" id="input"/>
+            <form action="/user" method="GET">
+                <input type="text" class="search-user-input" placeholder="USERNAME" id="search-user-input" />
+            </form>
 
             {{!-- <i class="material-icons own-menu-icon">&#xe5d2;</i> --}}
             <div id="header__login">

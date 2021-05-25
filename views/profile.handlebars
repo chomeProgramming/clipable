@@ -2,31 +2,34 @@
     <div>
         <h3 id="user-username" class="text">Username: </h3>
         <h3 id="user-email" class="text">Email: </h3>
+        <h3 id="user-last-login" class="text">Last Login: </h3>
     </div>
 
-    <div>
+    <div class="reset-forms-container">
+        <h9 style="color: green; text-align: center;">{{ successMessage }}</h9>
         <h9 style="color: red; text-align: center;">{{ errMessage }}</h9>
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <input type="username" class="input" name="new_username" placeholder="New username">
 
+            <input type="username" class="input" name="new_username" value="{{inputData.new_username}}" placeholder="New username">
             <input type="password" class="input" name="password" placeholder="Password">
-            <button type="submit" class="btn button">Change Username</button>
+            <button type="submit" class="btn button">SET</button>
         </form>
 
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <input type="email" class="input" name="new_email" placeholder="New email">
 
+            <input type="email" class="input" name="new_email" value="{{inputData.new_email}}" placeholder="New email">
             <input type="password" class="input" name="password" placeholder="Password">
-            <button type="submit" class="btn button">Change Email</button>
+            <button type="submit" class="btn button">SET</button>
         </form>
 
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
             <input type="password" class="input" name="password" placeholder="Old password">
             <input type="password" class="input" name="new_password" placeholder="New password">
-            <button type="submit" class="btn button">Change Password</button>
+            <button type="submit" class="btn button">SET</button>
         </form>
     </div>
 </div>
@@ -40,5 +43,9 @@
             return
         getUserElement("#user-username").innerHTML += authUser.username
         getUserElement("#user-email").innerHTML += authUser.email
+        const lastLogin = new Date(authUser.last_login)
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        const outputDate = `${months[lastLogin.getMonth()]} ${lastLogin.getDate()}, ${lastLogin.getFullYear()} ${lastLogin.getHours()}:${lastLogin.getMinutes()<10?"0"+lastLogin.getMinutes():lastLogin.getMinutes()}`
+        getUserElement("#user-last-login").innerHTML += outputDate
     })
 </script>

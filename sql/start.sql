@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS auth_users (
     password TEXT NOT NULL,
     isAdmin BOOLEAN DEFAULT FALSE,
     timezone TEXT,
-    last_login DATE
+    last_login TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 CREATE TABLE IF NOT EXISTS auth_devices (
     device_id TEXT NOT NULL PRIMARY KEY,
