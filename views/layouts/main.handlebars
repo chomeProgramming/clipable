@@ -14,6 +14,21 @@
 
         <script src="/views/static/main.js"></script>
         <script>
+            const getAuthUser = async (f) => {
+                await fetch("/authUser", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ _csrf: "{{csrfToken}}" })
+                })
+                    .then(result => result.json())
+                    .then(authUser => {
+                        f(null, authUser)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        f(err.message, null)
+                    })
+            }
             document.addEventListener("DOMContentLoaded", async () => {
                 await fetch("/authUser", {
                     method: "POST",
@@ -42,18 +57,19 @@
                 document.querySelector(`#themeSelect option[value=${localStorage.getItem("theme-color")}]`).selected = true
 
                 setUpAuthUser()
+                headerImgNavigation()
             })
             function setUpAuthUser() {
                 const authUser = JSON.parse(document.body.getAttribute("data-auth-user"))
                 const headerLogin = document.querySelector("#header__login")
                 if (authUser) {
-                    const aUsername = `<a class="btn button" href="#">${authUser.username}</a>`
+                    const aUsername = `<a class="btn button" href="/profile">${authUser.username}</a>`
                     headerLogin.innerHTML = aUsername + headerLogin.innerHTML
                 }
                 const menuContent = document.querySelectorAll(".menu-content")[0]
                 let insert
                 if (authUser)
-                    insert = `<a href="#" class="title-text">${authUser.username}</a>
+                    insert = `<a href="/profile" class="title-text">${authUser.username}</a>
                         <a href="/logout">Logout</a>
                         <a href="/create">Create</a>`
                 else
@@ -69,6 +85,11 @@
                 menuContent.innerHTML = menuContent.innerHTML + insert
                 menuContentChildren.slice(1).forEach(child => {
                     menuContent.appendChild(child)
+                })
+            }
+            function headerImgNavigation() {
+                document.querySelectorAll("#header__image > *").forEach(item => {
+                    item.onclick = () => window.location.href = "/"
                 })
             }
 

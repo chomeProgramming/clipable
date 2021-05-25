@@ -14,6 +14,7 @@ const db = new Pool({
 const getAuthUserSQL = fs.readFileSync("./sql/getAuthUser.sql").toString()
 const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split(";")
 const loginSQL = fs.readFileSync("./sql/login.sql").toString()
+const resetPasswordSQL = fs.readFileSync("./sql/resetPassword.sql").toString()
 
 let DEVICE_ID
 machineId().then(id => {
@@ -25,7 +26,7 @@ const outputError = (req, error) => {
     errMessage = error
     inputData = req.body
 }
-const forbiddenLoggedOut = ["/logout", "/create"]
+const forbiddenLoggedOut = ["/logout", "/create", "/profile"]
 const forbiddenLoggedIn = ["/login", "/signup"]
 
 router.get("/login", (req, res) => {
@@ -105,7 +106,23 @@ router.post("/authUser", (req, res) => {
 router.get('/profile', (req, res) => {
     res.render("profile", {
         title: "Profile",
-        csrfToken: req.csrfToken
+        csrfToken: req.csrfToken,
+        errMessage
+    })
+    errMessage = ""
+})
+router.post('/profile', (req, res) => {
+    if (!req.body.old_password || !req.body.new_password) {
+        outputError(req, "Something is missing.")
+        return res.redirect("/profile")
+    }
+    db.query(resetPasswordSQL, [md5(req.body.new_password), req.body.authUser.user_id, md5(req.body.old_password)], (err, result) => {
+        if (err)
+            console.log(err)
+        if (result.rowCount == 0) {
+            outputError(req, "Wrong password.")
+        }
+        res.redirect("/profile")
     })
 })
 
