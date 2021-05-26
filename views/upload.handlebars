@@ -66,8 +66,8 @@
         <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-video">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="mb-3 upload-video" id="upload-div">
-                <input class="form-control" type="text" placeholder="TITLE" id="uploadTitle" name="title" maxlength="32">
-                <input class="form-control" type="text" placeholder="DESCRIPTION (Needn't to be filled)" id="uploadDescription" name="description" maxlength="100">
+                <input class="form-control" type="text" placeholder="TITLE" id="uploadTitle" name="title" maxlength="12">
+                <input class="form-control" type="text" placeholder="DESCRIPTION (Needn't to be filled)" id="uploadDescription" name="description" maxlength="125">
                 <div class="drag-drop-div" id="dragDropDiv">
                     <label for="chooseUploadVideo"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.<br>
                         <p style="font-size: 12px; text-align: center;">You can only choose 1 video!</p>

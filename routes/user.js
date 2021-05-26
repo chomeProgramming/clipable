@@ -2,6 +2,7 @@ const express = require("express")
 const fs = require("fs")
 const md5 = require("md5")
 const { machineId, machineIdSync } = require("node-machine-id")
+const { LocalStorage } = require("node-localstorage")
 const { Pool, Client } = require("pg")
 
 const router = express.Router()
@@ -12,7 +13,7 @@ const db = new Pool({
     }
 })
 const getAuthUserSQL = fs.readFileSync("./sql/getAuthUser.sql").toString()
-const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split(";")
+const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split("|")
 const loginSQL = fs.readFileSync("./sql/login.sql").toString()
 
 // let DEVICE_ID
@@ -57,7 +58,7 @@ router.get("/signup", (req, res) => {
 })
 
 router.get("/logout", (req, res) => {
-    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [req.session.device_uuid], (err) => {
+    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [LocalStorage.device_uuid], (err) => {
         if (err)
             console.log(err.message)
         res.redirect("/logout")
@@ -69,7 +70,7 @@ router.post("/login", async (req, res) => {
         outputError(req, "Something is missing.")
         return res.redirect("/login")
     }
-    db.query(loginSQL, [req.body.username_email, md5(req.body.password), req.session.device_uuid], (err, result) => {
+    db.query(loginSQL, [req.body.username_email, md5(req.body.password), LocalStorage.device_uuid], (err, result) => {
         if (err)
             console.log(err.message)
         if (result.rowCount == 0 || !result.rows[0].user_id)
@@ -88,7 +89,6 @@ router.post("/signup", (req, res) => {
         outputError(req, "Something is missing.")
         return res.redirect("/signup")
     }
-
     db.query(signupSQL[0], [req.body.username, md5(req.body.password), req.body.email, false], async (err, newUser) => {
         if (err) {
             console.log(err.message)
@@ -96,7 +96,7 @@ router.post("/signup", (req, res) => {
             return res.redirect("/signup")
         }
 
-        db.query(signupSQL[2], [newUser.rows[0].id, req.session.device_id], (err) => {
+        db.query(signupSQL[2], [newUser.rows[0].id, LocalStorage.device_uuid], (err) => {
             if (err) {
                 outputError(req, err.message)
                 return res.redirect("/signup")
@@ -170,21 +170,26 @@ router.get("/user/:username", (req, res) => {
         if (result.rowCount !== 1)
             return res.send(`Sorry, but this a user with this username does not exist.\nMaybe you have written it wrong.`)
 
-        res.render("user", {
-            csrfToken: req.csrfToken,
-            currentUser: result.rows[0]
+        db.query("SELECT * FROM videos WHERE user_id = $1", [result.rows[0].id], (err2, videos) => {
+            if (err) console.log(err)
+
+            res.render("user", {
+                csrfToken: req.csrfToken,
+                currentUser: result.rows[0],
+                videos: videos.rows,
+            })
         })
     })
 })
 
 const getAuthUser = (req, res, next) => {
     const getAuthFunction = () => {
-        db.query("SELECT * FROM auth_devices WHERE device_id = $1", [req.session.device_uuid], (err, result) => {
+        db.query("SELECT * FROM auth_devices WHERE device_id = $1", [LocalStorage.device_uuid], (err, result) => {
             if (err) {
                 console.log("Error: "+err.message)
                 return next()
             }
-            db.query(getAuthUserSQL, [req.session.device_uuid], (err, result) => {
+            db.query(getAuthUserSQL, [LocalStorage.device_uuid], (err, result) => {
                 if (err)
                     console.log(err.message)
                 if (result.rowCount == 0) {
@@ -201,16 +206,19 @@ const getAuthUser = (req, res, next) => {
         })
     }
 
-    if (!req.session.device_uuid) {
+    console.log(LocalStorage.device_uuid)
+    if (!LocalStorage.device_uuid) {
         db.query(signupSQL[1], (err, authDevice) => {
             if (err)
                 console.log("Error: "+err.message)
 
-            req.session.device_uuid = authDevice.rows[0].device_id
+            // req.session.device_uuid = authDevice.rows[0].device_id
+            LocalStorage.device_uuid = authDevice.rows[0].device_id
             getAuthFunction()
         })
-    } else
+    } else {
         getAuthFunction()
+    }
 }
 
 module.exports = {

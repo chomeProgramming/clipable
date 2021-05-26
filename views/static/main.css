@@ -32,29 +32,52 @@
     color: white;
 }
 
+.set-data-input {
+    background-color: var(--main-ui-color);
+    border: none;
+    padding: 5px;
+    border-radius: 7.5px;
+    color: white;
+}
+
 body {
     background-color: var(--main-bg-color);
     padding-bottom: 100px;
 }
 
-#info {
+.info {
     border-radius: 20px;
     position: relative;
     left: 50%;
     top: 0;
     max-width: 90%;
     transform: translate(-50%, 0);
+    margin-bottom: 25px;
 }
 
-#info > div {
+.info > div {
     padding: 20px;
 }
 
-#info-main {
+.info > a {
+    padding: 20px;
+}
+
+.info > a > video {
+    border-radius: 12.5px;
+}
+
+.info-main {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
+#video-desc {
+    margin-left: 5px;
+    color: var(--main-text-color);
+}
+
 .reset-forms-container > form input {
     padding: 5px;
     border: 1px solid gray;
@@ -257,6 +280,10 @@ body {
 
 @media only screen and (max-width: 260px) {
     #header__login > a {
+        display: none;
+    }
+
+    #video-desc {
         display: none;
     }
 }

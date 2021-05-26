@@ -1,6 +1,9 @@
-<div class="background" id="info">
+<div class="background info" style="padding-top: 50px;">
     <div>
-        <h3 id="user-username" class="text">Username: </h3>
+        <div>
+            <a class="btn button" style="position: absolute; top: 15px; right: 15px; margin: 10px;" id="usersPage" href="/user/">User's Page</a>
+            <h3 id="user-username" class="text">Username: </h3>
+        </div>
         <h3 id="user-email" class="text">Email: </h3>
         <h3 id="user-last-login" class="text">Last Login: </h3>
     </div>
@@ -11,24 +14,24 @@
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-            <input type="username" class="input" name="new_username" value="{{inputData.new_username}}" placeholder="New username">
-            <input type="password" class="input" name="password" placeholder="Password">
+            <input type="username" class="set-data-input" name="new_username" value="{{inputData.new_username}}" placeholder="New username">
+            <input type="password" class="set-data-input" name="password" placeholder="Password">
             <button type="submit" class="btn button">SET</button>
         </form>
 
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-            <input type="email" class="input" name="new_email" value="{{inputData.new_email}}" placeholder="New email">
-            <input type="password" class="input" name="password" placeholder="Password">
+            <input type="email" class="set-data-input" name="new_email" value="{{inputData.new_email}}" placeholder="New email">
+            <input type="password" class="set-data-input" name="password" placeholder="Password">
             <button type="submit" class="btn button">SET</button>
         </form>
 
         <form action="/profile" method="POST" style="text-align: center; margin-bottom: 15px">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-            <input type="password" class="input" name="password" placeholder="Old password">
-            <input type="password" class="input" name="new_password" placeholder="New password">
+            <input type="password" class="set-data-input" name="password" placeholder="Old password">
+            <input type="password" class="set-data-input" name="new_password" placeholder="New password">
             <button type="submit" class="btn button">SET</button>
         </form>
     </div>
@@ -41,6 +44,9 @@
     getAuthUser((err, authUser) => {
         if (err || !authUser)
             return
+
+        getUserElement("#usersPage").href += authUser.username
+
         getUserElement("#user-username").innerHTML += authUser.username
         getUserElement("#user-email").innerHTML += authUser.email
         const lastLogin = new Date(authUser.last_login)

@@ -1,14 +1,15 @@
 const express = require("express")
 const exphbs = require("express-handlebars")
-const jwt = require("jsonwebtoken")
+// const jwt = require("jsonwebtoken")
 const fs = require("fs")
 const path = require("path")
-const fileUpload = require("express-fileupload")
+// const fileUpload = require("express-fileupload")
 const { Pool, Client } = require("pg")
 const multer = require('multer')
 const csrf = require("csurf")
 const session = require("express-session")
 const cookieParser = require("cookie-parser")
+const { LocalStorage } = require("node-localstorage")
 // const authorize = require("./routes/authorization-middleware")
 
 const app = express()
@@ -64,9 +65,6 @@ app.use(session({ secret: require("./config.js").JWT_SECRET, resave: false, save
 // app.use(csrf({ cookie: true }))
 app.use(csrf())
 
-app.use(require("./routes/user").getAuthUser)
-app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
-
 // db.query("DELETE FROM auth_devices;", (err) => {
 //     if (err)
 //         console.log(err)
@@ -78,6 +76,9 @@ app.use((req, res, next) => {
         next()
     })
 })
+
+app.use(require("./routes/user").getAuthUser)
+app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
 
 app.get("/", (req, res) => {
     db.query("SELECT * FROM videos;", (err, result) => {
@@ -108,6 +109,11 @@ app.use("/", require("./routes/user").router)
 //     const token = jwt.sign(payload, require("./config").JWT_SECRET)
 //     res.send(token)
 // })
+app.get("/discover", (req, res) => {
+    res.render("discover", {
+        title: "Discover"
+    })
+})
 
 app.get('/favicon.ico', (req, res) => {
     res.writeHead(200, {'Content-Type': 'image/jpeg'});
