@@ -177,7 +177,11 @@ router.get("/user/:username", (req, res) => {
     })
 })
 router.get("/deviceId", (req, res) => {
-    res.json(require("node-machine-id").machineIdSync())
+    // res.json(require("machine-uuid-sync")())
+    require("machine-uuid")(function(uuid) {
+        res.json(uuid)
+    })
+    // res.json(require("node-machine-id").machineIdSync())
 })
 
 const getAuthUser = async (req, res, next) => {
