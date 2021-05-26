@@ -67,6 +67,10 @@ app.use(csrf())
 app.use(require("./routes/user").getAuthUser)
 app.use("/views/static/", express.static(path.join(__dirname, "views/static")))
 
+// db.query("DELETE FROM auth_devices;", (err) => {
+//     if (err)
+//         console.log(err)
+// })
 app.use((req, res, next) => {
     db.query(sqls.start, (err) => {
         if (err)

@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS auth_users (
     last_login TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 CREATE TABLE IF NOT EXISTS auth_devices (
-    device_id TEXT NOT NULL PRIMARY KEY,
+    device_id UUID DEFAULT uuid_generate_v4 () PRIMARY KEY,
     user_id INTEGER,
     FOREIGN KEY (user_id)
         REFERENCES auth_users (id)

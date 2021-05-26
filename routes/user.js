@@ -57,7 +57,7 @@ router.get("/signup", (req, res) => {
 })
 
 router.get("/logout", (req, res) => {
-    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [req.body.authUser.device_id], (err) => {
+    db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [req.session.device_uuid], (err) => {
         if (err)
             console.log(err.message)
         res.redirect("/logout")
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
         outputError(req, "Something is missing.")
         return res.redirect("/login")
     }
-    db.query(loginSQL, [req.body.username_email, md5(req.body.password), await machineId()], (err, result) => {
+    db.query(loginSQL, [req.body.username_email, md5(req.body.password), req.session.device_uuid], (err, result) => {
         if (err)
             console.log(err.message)
         if (result.rowCount == 0 || !result.rows[0].user_id)
@@ -96,7 +96,7 @@ router.post("/signup", (req, res) => {
             return res.redirect("/signup")
         }
 
-        db.query(signupSQL[2], [newUser.rows[0].id, await machineId()], (err) => {
+        db.query(signupSQL[2], [newUser.rows[0].id, req.session.device_id], (err) => {
             if (err) {
                 outputError(req, err.message)
                 return res.redirect("/signup")
@@ -143,7 +143,7 @@ router.post("/profile", (req, res) => {
     db.query("SELECT username FROM auth_users WHERE username != $1", [req.body.authUser.username], (err, users_usernames) => {
         if (err)
             console.log(err)
-        
+
         users_usernames = users_usernames.rows.map(user => user.username)
         if (reset_type == "new_username" && users_usernames.includes(reset_value)) {
             outputError(req, "Username already exists.")
@@ -176,43 +176,41 @@ router.get("/user/:username", (req, res) => {
         })
     })
 })
-router.get("/deviceId", (req, res) => {
-    // res.json(require("machine-uuid-sync")())
-    require("machine-uuid")(function(uuid) {
-        res.json(uuid)
-    })
-    // res.json(require("node-machine-id").machineIdSync())
-})
 
-const getAuthUser = async (req, res, next) => {
-    const DEVICE_ID = await machineId()
-    console.log(DEVICE_ID)
-    db.query("SELECT * FROM auth_devices WHERE device_id = $1", [DEVICE_ID], (err, result) => {
-        if (err) {
-            console.log("Error: "+err.message)
-            return next()
-        }
-        if (result.rowCount == 0) {
-            db.query(signupSQL[1], [DEVICE_ID], (err) => {
-                if (err)
-                    console.log("Error: "+err.message)
-            })
-        }
-        db.query(getAuthUserSQL, [DEVICE_ID], (err, result) => {
-            if (err)
-                console.log(err.message)
-            if (result.rowCount == 0) {
-                req.body.authUser = null
-                if (forbiddenLoggedOut.includes(req.originalUrl))
-                    return res.redirect("/")
-            } else {
-                req.body.authUser = result.rows[0]
-                if (forbiddenLoggedIn.includes(req.originalUrl))
-                    return res.redirect("/")
+const getAuthUser = (req, res, next) => {
+    const getAuthFunction = () => {
+        db.query("SELECT * FROM auth_devices WHERE device_id = $1", [req.session.device_uuid], (err, result) => {
+            if (err) {
+                console.log("Error: "+err.message)
+                return next()
             }
-            next()
+            db.query(getAuthUserSQL, [req.session.device_uuid], (err, result) => {
+                if (err)
+                    console.log(err.message)
+                if (result.rowCount == 0) {
+                    req.body.authUser = null
+                    if (forbiddenLoggedOut.includes(req.originalUrl))
+                        return res.redirect("/")
+                } else {
+                    req.body.authUser = result.rows[0]
+                    if (forbiddenLoggedIn.includes(req.originalUrl))
+                        return res.redirect("/")
+                }
+                next()
+            })
         })
-    })
+    }
+
+    if (!req.session.device_uuid) {
+        db.query(signupSQL[1], (err, authDevice) => {
+            if (err)
+                console.log("Error: "+err.message)
+
+            req.session.device_uuid = authDevice.rows[0].device_id
+            getAuthFunction()
+        })
+    } else
+        getAuthFunction()
 }
 
 module.exports = {
