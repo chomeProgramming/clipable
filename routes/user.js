@@ -206,7 +206,6 @@ const getAuthUser = (req, res, next) => {
         })
     }
 
-    console.log(LocalStorage.device_uuid)
     if (!LocalStorage.device_uuid) {
         db.query(signupSQL[1], (err, authDevice) => {
             if (err)

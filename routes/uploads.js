@@ -41,17 +41,17 @@ const sqls = {
 
 
 router.get("/post/:id", (req, res) => {
-    db.query("SELECT * FROM videos WHERE id = $1", [req.params.id], (err, { rows }) => {
+    db.query("SELECT videos.id as video_id,title,description,mimetype,uploadtype,auth_users.id as user_id,username,email FROM videos JOIN auth_users ON videos.user_id = auth_users.id WHERE videos.id = $1;", [req.params.id], (err, result) => {
         if (err) {
             console.log(err)
             return res.redirect("/")
         }
-        if (rows.length !== 1)
-            return res.render("not_found")
+        if (result.rowCount !== 1)
+            return displayNotFound(res)
 
         res.render("post", {
             csrfToken: req.csrfToken,
-            video: rows[0]
+            video: result.rows[0]
         })
     })
 })

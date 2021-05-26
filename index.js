@@ -110,8 +110,19 @@ app.use("/", require("./routes/user").router)
 //     res.send(token)
 // })
 app.get("/discover", (req, res) => {
-    res.render("discover", {
-        title: "Discover"
+    if (!req.query.search) {
+        return res.render("discover", {
+            title: "Discover",
+            csrfToken: req.csrfToken
+        })
+    }
+    db.query(`SELECT * FROM videos WHERE title ILIKE $1 OR description LIKE $1;`, [`%${req.query.search}%`], (err, searchedResults) => {
+        if (err) console.log(err)
+        return res.render("discover", {
+            title: "Discover",
+            csrfToken: req.csrfToken,
+            searchedResults: searchedResults.rows
+        })
     })
 })
 

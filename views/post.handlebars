@@ -38,6 +38,12 @@
         padding: 10px;
         color: var(--main-text-color);
     }
+    .user-button {
+        position: relative;
+        margin-bottom: 10px;
+        left: 10px;
+        width: 75px;
+    }
 
     @media only screen and (max-width: 600px) {
         #video-container {
@@ -55,7 +61,7 @@
 <div id="video-container">
     <h1 id="video-title">{{ video.title }}</h1>
     <video id="video-video" controls controlsList="nodownload">
-        <source src="/videos/{{video.id}}.{{video.mimetype}}">
+        <source src="/videos/{{video.video_id}}.{{video.mimetype}}">
     </video>
     <h4>
         {{#if video.description}}
@@ -64,6 +70,7 @@
             <h6 id="video-desc">No description.</h6>
         {{/if}}
     </h4>
+    <a class="btn button user-button" href="/user/{{video.username}}">{{ video.username }}</a>
 </div>
 
 {{!-- https://www.youtube.com/watch?v=MxfxiR8TVNU --}}

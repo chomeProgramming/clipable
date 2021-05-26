@@ -1,0 +1,54 @@
+<style>
+    #video-container {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .videos-items {
+        display: flex;
+        flex-direction: row;
+        align-self: center;
+        text-decoration: none;
+        width: 70%;
+        min-width: 300px;
+        max-width: 800px;
+        padding: 0;
+        margin: 10px;
+    }
+    .video {
+        min-width: 175px;
+        width: 50%;
+    }
+    #vide-desc {
+        min-width: 125px;
+    }
+    #video-desc * {
+        word-wrap: break-word;   
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 50px;
+    }
+</style>
+
+<form class="search-form" method="GET">
+    <input type="text" class="form-control" style="width: 50%;" name="search" placeholder="Search">
+</form>
+<div class="background info" id="video-container">
+    {{#each searchedResults}}
+        <a class="videos-items" href="/post/{{this.id}}">
+            <video class="video">
+                <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
+            </video>
+            <div id="video-desc">
+                <h3>{{this.title}}</h3>
+                <h6 class="video-description">{{this.description}}</h6>
+            </div>
+        </a>
+    {{/each}}
+</div>
