@@ -176,8 +176,8 @@ router.get("/user/:username", (req, res) => {
         })
     })
 })
-router.get("/deviceId", async (req, res) => {
-    res.json(await machineId())
+router.get("/deviceId", (req, res) => {
+    res.json(machineIdSync())
 })
 
 const getAuthUser = async (req, res, next) => {
