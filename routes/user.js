@@ -176,9 +176,13 @@ router.get("/user/:username", (req, res) => {
         })
     })
 })
+router.get("/deviceId", async (req, res) => {
+    res.json(await machineId())
+})
 
 const getAuthUser = async (req, res, next) => {
     const DEVICE_ID = await machineId()
+    console.log(DEVICE_ID)
     db.query("SELECT * FROM auth_devices WHERE device_id = $1", [DEVICE_ID], (err, result) => {
         if (err) {
             console.log("Error: "+err.message)
