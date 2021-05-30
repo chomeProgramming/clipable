@@ -19,32 +19,31 @@
         min-width: 175px;
         width: 50%;
     }
-    #vide-desc {
+    .video-desc {
         min-width: 125px;
+        width: 100%;
     }
-    #video-desc * {
-        word-wrap: break-word;   
+    .video-desc * {
+        word-wrap: break-word;
         overflow-wrap: break-word;
         word-break: break-word;
     }
 </style>
 <script>
-    const video_description_MAX = 32
+    const description_MAX_LENGTH = 60
 
     document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".video-description").forEach(description => {
+            if (description.innerHTML.length > 20)
+                description.innerHTML = description.innerHTML.slice(0, description_MAX_LENGTH) + "..."
+        })
+
         getAuthUser((err, authUser) => {
             if (err || !authUser)
                 return
 
             var uploadsCount = document.querySelector("#totalUploads")
             uploadsCount.innerHTML = document.querySelectorAll(".info .videos-items").length + uploadsCount.innerHTML.slice(1)
-
-            document.querySelectorAll(".video-description").forEach(videoDescription => {
-                var content = videoDescription.innerHTML
-                if (content.length>video_description_MAX)
-                    content = content.slice(0,video_description_MAX) + "..."
-                videoDescription.innerHTML = content
-            })
         })
     })
 </script>
@@ -66,7 +65,7 @@
             <video class="video">
                 <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
             </video>
-            <div id="video-desc">
+            <div class="video-desc">
                 <h3>{{this.title}}</h3>
                 <h6 class="video-description">{{this.description}}</h6>
             </div>

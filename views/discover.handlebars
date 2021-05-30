@@ -19,10 +19,50 @@
         min-width: 175px;
         width: 50%;
     }
-    #vide-desc {
+    .video-desc {
         min-width: 125px;
+        width: 100%;
     }
-    #video-desc * {
+    .video-desc * {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    #overview-video-container {
+        position: relative;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;        
+    }
+    .overview-videos-items {
+        border: 1px solid blue;
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        text-decoration: none;
+        width: 200px;
+        height: 180px;
+        padding: 0;
+        margin: 10px;
+    }
+    .overview-video {
+        width: 100%;
+        max-height: 120px;
+    }
+    .overview-video-desc {
+        min-width: 125px;
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    .overview-video-desc * {
+        font-size: 20px;
         word-wrap: break-word;   
         overflow-wrap: break-word;
         word-break: break-word;
@@ -37,18 +77,54 @@
 </style>
 
 <form class="search-form" method="GET">
-    <input type="text" class="form-control" style="width: 50%;" name="search" placeholder="Search">
+    <input
+        type="text"
+        class="form-control"
+        style="width: 50%;"
+        name="search"
+        placeholder="Search"
+        value="{{inputData.search}}"
+    >
 </form>
-<div class="background info" id="video-container">
-    {{#each searchedResults}}
-        <a class="videos-items" href="/post/{{this.id}}">
-            <video class="video">
-                <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
-            </video>
-            <div id="video-desc">
-                <h3>{{this.title}}</h3>
-                <h6 class="video-description">{{this.description}}</h6>
-            </div>
-        </a>
-    {{/each}}
-</div>
+{{#if isOverview}}
+    <div id="overview-video-container">
+        {{#each searchedResults}}
+            <a class="overview-videos-items" href="/post/{{this.id}}">
+                <video class="overview-video">
+                    <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
+                </video>
+                <div class="overview-video-desc">
+                    <h3>{{this.title}}</h3>
+                </div>
+            </a>
+        {{/each}}
+    </div>
+    {{#if nothingFound}}
+        <h1 style="text-align: center;">Nothing uploaded yet.</h1>
+    {{/if}}
+{{else}}
+    <div class="background info" id="video-container">
+        {{#each searchedResults}}
+            <a class="videos-items" href="/post/{{this.id}}">
+                <video class="video">
+                    <source src="/videos/{{this.id}}.{{this.mimetype}}" type="video/mp4">
+                </video>
+                <div class="video-desc">
+                    <h3>{{this.title}}</h3>
+                    <h6 class="video-description">{{this.description}}</h6>
+                </div>
+            </a>
+        {{/each}}
+    </div>
+    {{#if nothingFound}}
+        <h1 style="text-align: center;">Nothing Found.</h1>
+    {{/if}}
+{{/if}}
+
+<script>
+    const description_MAX_LENGTH = 60
+    document.querySelectorAll(".video-description").forEach(description => {
+        if (description.innerHTML.length > 20)
+            description.innerHTML = description.innerHTML.slice(0, description_MAX_LENGTH) + "..."
+    })
+</script>
