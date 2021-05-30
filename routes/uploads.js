@@ -2,7 +2,7 @@ const express = require("express")
 const path = require("path")
 const fs = require("fs")
 const multer = require('multer')
-const { LocalStorage } = require("node-localstorage")
+// const { LocalStorage } = require("node-localstorage")
 const { Pool, Client } = require("pg")
 
 const router = express.Router()
@@ -72,7 +72,8 @@ router.post("/upload", upload.single("video"), (req, res) => {
 
     const fileName = req.file.filename
     const file_uuid = fileName.slice(0, fileName.lastIndexOf("."))
-    db.query(sqls.getAuthUser, [LocalStorage.device_uuid], (err2, selfAuthUser) => {
+    // db.query(sqls.getAuthUser, [LocalStorage.device_uuid], (err2, selfAuthUser) => {
+    db.query(sqls.getAuthUser, [req.session.device_uuid], (err2, selfAuthUser) => {
         if (err2) console.log(err2)
         if (selfAuthUser.rowCount !== 1) return console.log("User is not loggedIn")
         db.query("INSERT INTO videos (id, mimetype, title, description, user_id) VALUES ($1, $2, $3, $4, $5);", [file_uuid, fileName.slice(fileName.lastIndexOf(".")+1), req.body.title, req.body.description?req.body.description:null, selfAuthUser.rows[0].user_id], (err) => {
