@@ -6,12 +6,8 @@ const { LocalStorage } = require("node-localstorage")
 const { Pool, Client } = require("pg")
 
 const router = express.Router()
-const db = new Pool({
-    connectionString: require("../client").connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
+const db = require("../client").dbPoolConnection
+
 const getAuthUserSQL = fs.readFileSync("./sql/getAuthUser.sql").toString()
 const signupSQL = fs.readFileSync("./sql/signup.sql").toString().split("|")
 const loginSQL = fs.readFileSync("./sql/login.sql").toString()
@@ -33,6 +29,15 @@ const displayNotFound = res => {
 const forbiddenLoggedOut = ["/logout", "/create", "/profile"]
 const forbiddenLoggedIn = ["/login", "/signup"]
 
+router.get("/users", (req, res) => {
+    db.query("SELECT * FROM auth_users;", (err, result) => {
+        if (err) console.log(err)
+        return res.render("discover_users", {
+            title: "Users",
+            users: result.rows
+        })
+    })
+})
 router.get("/login", (req, res) => {
     res.render("login", {
         layout: "user",
@@ -44,7 +49,6 @@ router.get("/login", (req, res) => {
     errMessage = ""
     inputData = {}
 })
-
 router.get("/signup", (req, res) => {
     res.render("signup", {
         layout: "user",
@@ -56,7 +60,6 @@ router.get("/signup", (req, res) => {
     errMessage = ""
     inputData = {}
 })
-
 router.get("/logout", (req, res) => {
     db.query("UPDATE auth_devices SET user_id = null WHERE device_id = $1", [LocalStorage.device_uuid], (err) => {
         if (err)
@@ -83,7 +86,6 @@ router.post("/login", async (req, res) => {
         })
     })
 })
-
 router.post("/signup", (req, res) => {
     if (!req.body.username || !req.body.password || !req.body.confirm_password) {
         outputError(req, "Something is missing.")

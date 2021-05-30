@@ -6,12 +6,8 @@ const { LocalStorage } = require("node-localstorage")
 const { Pool, Client } = require("pg")
 
 const router = express.Router()
-const db = new Pool({
-    connectionString: require("../client").connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
+const db = require("../client").dbPoolConnection
+
 const fileStorageEngine = multer.diskStorage({
     destination: (req, file, cb) => {
         if (file.mimetype.split("/")[0] == "video")

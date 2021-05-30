@@ -15,12 +15,7 @@ const { LocalStorage } = require("node-localstorage")
 const app = express()
 const PORT = process.env.PORT || 2662
 
-const db = new Pool({
-    connectionString: require("./client").connectionString,
-    ssl: {
-        rejectUnauthorized: false
-    }
-})
+const db = require("./client").dbPoolConnection
 // db.connect()  // only at Client
 
 // const upload = multer({ dest: './uploads/' })
@@ -111,17 +106,54 @@ app.use("/", require("./routes/user").router)
 // })
 app.get("/discover", (req, res) => {
     if (!req.query.search) {
-        return res.render("discover", {
-            title: "Discover",
-            csrfToken: req.csrfToken
+        return db.query("SELECT * FROM videos;", (err, searchedResults) => {
+            if (err) console.log(err)
+            return res.render("discover", {
+                title: "Discover",
+                csrfToken: req.csrfToken,
+                searchedResults: searchedResults.rows,
+                isOverview: true,
+                nothingFound: searchedResults.length == 0
+            })
         })
     }
-    db.query(`SELECT * FROM videos WHERE title ILIKE $1 OR description LIKE $1;`, [`%${req.query.search}%`], (err, searchedResults) => {
+
+    const searchBy = type => {
+        let lv_searchBy = []
+        const searchWords = req.query.search.split(" ")
+        for (var i = 0; i < searchWords.length; i++) {
+            lv_searchBy.push(`$${i+1}`)
+        }
+        lv_searchBy = lv_searchBy.join(` OR ${type} ILIKE `)
+
+        return {
+            sql: `${type} ILIKE ${lv_searchBy}`,
+            items: searchWords.map(word => `%${word}%`)
+        }
+    }
+
+    const searchSQL = `SELECT * FROM videos WHERE ${searchBy("title").sql} OR ${searchBy("description").sql};`
+
+    db.query(searchSQL, searchBy("").items, (err, searchedResults) => {
         if (err) console.log(err)
+        searchedResults = searchedResults.rows.sort((a, b) => {
+            var aCount = 0
+            var bCount = 0
+            req.query.search.split(" ").forEach(word => {
+                word = word.toLowerCase()
+                if (a.title.toLowerCase().includes(word) || (a.description && a.description.toLowerCase().includes(word)))
+                    aCount++
+                if (b.title.toLowerCase().includes(word) || (b.description && b.description.toLowerCase().includes(word)))
+                    bCount++
+            })
+            return bCount - aCount
+        })
         return res.render("discover", {
             title: "Discover",
             csrfToken: req.csrfToken,
-            searchedResults: searchedResults.rows
+            searchedResults: searchedResults,
+            inputData: req.query,
+            nothingFound: searchedResults.length == 0
         })
     })
 })

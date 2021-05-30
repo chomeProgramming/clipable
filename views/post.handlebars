@@ -34,7 +34,10 @@
         max-height: 85vh;
     }
 
-    #video-title, #video-desc {
+    #video-title, .video-desc {
+        word-wrap: break-word;   
+        overflow-wrap: break-word;
+        word-break: break-word;
         padding: 10px;
         color: var(--main-text-color);
     }
@@ -65,9 +68,9 @@
     </video>
     <h4>
         {{#if video.description}}
-            <h6 id="video-desc">{{ video.description }}</h6>
+            <h6 class="video-desc">{{ video.description }}</h6>
         {{else}}
-            <h6 id="video-desc">No description.</h6>
+            <h6 class="video-desc">No description.</h6>
         {{/if}}
     </h4>
     <a class="btn button user-button" href="/user/{{video.username}}">{{ video.username }}</a>
