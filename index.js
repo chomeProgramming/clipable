@@ -9,6 +9,7 @@ const multer = require('multer')
 const csrf = require("csurf")
 const session = require("express-session")
 const cookieParser = require("cookie-parser")
+const MemoryStore = require("memorystore")(session)
 // const { LocalStorage } = require("node-localstorage")
 // const authorize = require("./routes/authorization-middleware")
 
@@ -56,7 +57,14 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }))
 app.set("view engine", "handlebars")
 
 app.use(cookieParser())
-app.use(session({ secret: require("./config.js").JWT_SECRET, resave: false, saveUninitialized: false }))
+app.use(session({
+    store: new MemoryStore({
+        checkPeriod: 10000 // prune expired entries every 24h
+    }),
+    secret: require("./config.js").JWT_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
 // app.use(csrf({ cookie: true }))
 app.use(csrf())
 
