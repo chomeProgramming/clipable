@@ -59,7 +59,7 @@ app.set("view engine", "handlebars")
 app.use(cookieParser())
 app.use(session({
     store: new MemoryStore({
-        checkPeriod: 10000 // prune expired entries every 24h
+        // checkPeriod: 10000 // prune expired entries every 24h
     }),
     secret: require("./config.js").JWT_SECRET,
     resave: false,
