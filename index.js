@@ -118,11 +118,36 @@ app.get("/discover", (req, res) => {
         })
     }
 
+    const findPairs = type => {
+        var searchParam = req.query.search
+        var pairs = []
+        var position = 0
+        while (position < req.query.search.length && position !== -1) {
+            var rendered1 = searchParam.slice(position).search(type) + position
+            // console.log("rendered1: ", rendered1)
+            if (rendered1 == -1) {
+                position = -1
+                continue
+            }
+
+            var rendered2 = searchParam.slice(rendered1 + 1).search(type) + rendered1 + 1
+            // console.log("rendered2: ", rendered2)
+            if (rendered2 !== -1 && rendered2 > rendered1) {
+                if (rendered1 + 1 !== rendered2)
+                    pairs.push([rendered1, rendered2])
+                position = rendered2 + 1
+            } else
+                position = -1
+
+            // console.log("position: ", position)
+        }
+        return pairs
+    }
     const searchBy = type => {
         let lv_searchBy = []
         const searchWords = req.query.search.split(" ")
         for (var i = 0; i < searchWords.length; i++) {
-            lv_searchBy.push(`$${i+1}`)
+            lv_searchBy.push(`$${ i + 1 }`)
         }
         lv_searchBy = lv_searchBy.join(` OR ${type} ILIKE `)
 
@@ -132,9 +157,32 @@ app.get("/discover", (req, res) => {
         }
     }
 
-    const searchSQL = `SELECT * FROM videos WHERE ${searchBy("title").sql} OR ${searchBy("description").sql};`
+    const mustWords = findPairs("\"").map(position => req.query.search.slice(position[0] + 1, position[1]))
 
-    db.query(searchSQL, searchBy("").items, (err, searchedResults) => {
+    const mustWordsRender = type => {
+        let result = []
+        var searchByLength = searchBy("").items.length
+        for (var i = 0; i < mustWords.length; i++) {
+            result.push(`$${ i + 1 + searchByLength}`)
+        }
+        result = result.join(` AND ${type} ILIKE `)
+
+        if (mustWords.length == 0)
+            return {
+                sql: `${type} ILIKE '%%'`,
+                items: [],
+                inOr: ""
+            }
+        return {
+            sql: `${type} ILIKE ${result}`,
+            items: mustWords.map(word => `%${word}%`),
+            inOr: "OR title ILIKE '%%' OR description ILIKE '%%'"
+        }
+    }
+
+    const searchSQL = `SELECT * FROM videos WHERE (${searchBy("title").sql} OR ${searchBy("description").sql} ${mustWordsRender("").inOr}) AND (${mustWordsRender("title").sql} OR ${mustWordsRender("description").sql});`
+
+    db.query(searchSQL, [...searchBy("").items, ...mustWordsRender("").items], (err, searchedResults) => {
         if (err) console.log(err)
         searchedResults = searchedResults.rows.sort((a, b) => {
             var aCount = 0

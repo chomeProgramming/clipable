@@ -1,8 +1,8 @@
 // Amit uncommentelni kell ha valamit csinálsz:
     // Ha a heroku-ra teszed fel, csak:
-        // sor 8+13
+        // sor 9+16+20+21+22
     // Ha a localhost-ban használod, csak:
-        // sor 9+13
+        // sor 10+16+20+21+22
 
 const { Pool, Client } = require("pg")
 
@@ -14,8 +14,11 @@ const connectionString = process.env.DATABASE_URL
 module.exports = {
     dbPoolConnection: new Pool({
         connectionString,
+        ssl: {
+            rejectUnauthorized: false
+        }
         // database: "clipable-offline",
         // user: "offline_tester",
-        // password: "offline_tester"
+        // password: "offline_tester",
     })
 }
